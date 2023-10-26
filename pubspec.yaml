@@ -1,0 +1,38 @@
+name: auxi_app
+description: PTools APP Client
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  get:
+  dio:
+  shared_preferences:
+  dio_smart_retry:
+  bruno:
+  filesize: ^2.0.1
+  proper_filesize: ^0.0.2
+  getwidget: ^4.0.0
+  flutter_svg: ^2.0.7
+  get_storage: ^2.1.1
+  logger:
+    git:
+      url: https://github.com/Bungeefan/logger.git
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
