@@ -1,3 +1,4 @@
+import 'package:auxi_app/common/glass_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -208,173 +209,178 @@ class LoginView extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orangeAccent,
-      body: Container(
-        padding: const EdgeInsets.only(top: 20),
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(begin: Alignment.topCenter, colors: [
-            Colors.teal.shade900,
-            Colors.teal.shade800,
-            Colors.teal.shade600,
-            Colors.teal.shade300
-          ]),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: GFCard(
-              height: 420,
-              boxFit: BoxFit.cover,
-              color: Colors.transparent,
-              // image: Image.asset('images/ptools.jpg'),
-              title: _buildLogo(),
-              content: Column(
-                children: [
-                  // _buildServerWidget(),
-                  ..._buildUserForm(),
-                ],
-              ),
-              buttonBar: GFButtonBar(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          GFCheckbox(
-                            size: 22,
-                            activeBgColor: GFColors.PRIMARY,
-                            onChanged: (value) {
-                              controller.isChecked = value;
-                            },
-                            value: controller.isChecked,
-                          ),
-                          const Text(
-                            '记住密码',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
+      // backgroundColor: Colors.orangeAccent,
+      body: GlassWidget(
+        child: Container(
+          padding: const EdgeInsets.only(top: 20),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(begin: Alignment.topCenter, colors: [
+              Colors.teal.shade900.withOpacity(0.5),
+              Colors.teal.shade800.withOpacity(0.5),
+              Colors.teal.shade600.withOpacity(0.5),
+              Colors.teal.shade300.withOpacity(0.5)
+            ]),
+          ),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: GFCard(
+                height: 420,
+                boxFit: BoxFit.cover,
+                color: Colors.transparent,
+                // image: Image.asset('images/ptools.jpg'),
+                title: _buildLogo(),
+                content: Column(
+                  children: [
+                    // _buildServerWidget(),
+                    ..._buildUserForm(),
+                  ],
+                ),
+                buttonBar: GFButtonBar(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GFCheckbox(
+                              size: 22,
+                              activeBgColor: GFColors.PRIMARY,
+                              onChanged: (value) {
+                                controller.isChecked = value;
+                              },
+                              value: controller.isChecked,
                             ),
-                          ),
-                        ],
-                      ),
-                      GFButton(
-                        text: '设置服务器',
-                        textStyle: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.orange,
-                        ),
-                        onPressed: () => Get.bottomSheet(SingleChildScrollView(
-                          child: Container(
-                            height: 300,
-                            color: Colors.teal,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextField(
-                                        controller: controller.serverController,
-                                        decoration: const InputDecoration(
-                                          hintText: '请输入服务器地址',
-                                          hintStyle:
-                                              TextStyle(color: Colors.white70),
-                                          // border: InputBorder.none
-                                        ),
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.cyan,
-                                        ),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp("[A-Z,a-z,0-9,/,:,.]"))
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 75,
-                                      child: GFButton(
-                                        text: "清除",
-                                        onPressed: controller.clearServerList,
-                                        type: GFButtonType.solid,
-                                        color: GFColors.DANGER,
-                                        size: 24,
-                                        icon: const Icon(
-                                          Icons.clear_all,
-                                          color: Colors.white,
-                                          size: 18,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 75,
-                                      child: GFButton(
-                                        text: "添加",
-                                        onPressed: controller.saveServerList,
-                                        type: GFButtonType.solid,
-                                        color: GFColors.PRIMARY,
-                                        size: 22,
-                                        icon: const Icon(
-                                          Icons.add_box,
-                                          color: Colors.white,
-                                          size: 18,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Expanded(child: openSelectServerSheet()),
-                              ],
+                            const Text(
+                              '记住密码',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
                             ),
+                          ],
+                        ),
+                        GFButton(
+                          text: '设置服务器',
+                          textStyle: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.orange,
                           ),
-                        )),
-                        type: GFButtonType.transparent,
-                        color: Colors.white,
-                        size: 22,
-                        icon: const Icon(
-                          Icons.select_all_outlined,
-                          color: Colors.orange,
-                          size: 16,
+                          onPressed: () =>
+                              Get.bottomSheet(SingleChildScrollView(
+                            child: Container(
+                              height: 300,
+                              color: Colors.teal,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                          controller:
+                                              controller.serverController,
+                                          decoration: const InputDecoration(
+                                            hintText: '请输入服务器地址',
+                                            hintStyle: TextStyle(
+                                                color: Colors.white70),
+                                            // border: InputBorder.none
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.cyan,
+                                          ),
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.allow(
+                                                RegExp("[A-Z,a-z,0-9,/,:,.]"))
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 75,
+                                        child: GFButton(
+                                          text: "清除",
+                                          onPressed: controller.clearServerList,
+                                          type: GFButtonType.solid,
+                                          color: GFColors.DANGER,
+                                          size: 24,
+                                          icon: const Icon(
+                                            Icons.clear_all,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 75,
+                                        child: GFButton(
+                                          text: "添加",
+                                          onPressed: controller.saveServerList,
+                                          type: GFButtonType.solid,
+                                          color: GFColors.PRIMARY,
+                                          size: 22,
+                                          icon: const Icon(
+                                            Icons.add_box,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Expanded(child: openSelectServerSheet()),
+                                ],
+                              ),
+                            ),
+                          )),
+                          type: GFButtonType.transparent,
+                          color: Colors.white,
+                          size: 22,
+                          icon: const Icon(
+                            Icons.select_all_outlined,
+                            color: Colors.orange,
+                            size: 16,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GFButton(
-                        onPressed: controller.doLogin,
-                        text: "登录",
-                        size: GFSize.LARGE,
-                        shape: GFButtonShape.square,
-                        type: GFButtonType.outline2x,
-                        color: Colors.white,
-                        textStyle: const TextStyle(
-                          fontSize: 16,
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GFButton(
+                          onPressed: controller.doLogin,
+                          text: "登录",
+                          size: GFSize.LARGE,
+                          shape: GFButtonShape.square,
+                          type: GFButtonType.outline2x,
+                          color: Colors.white,
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      GFButton(
-                        onPressed: () => controller.box.remove('userinfo'),
-                        text: "重置",
-                        size: GFSize.LARGE,
-                        shape: GFButtonShape.square,
-                        type: GFButtonType.outline2x,
-                        color: Colors.white,
-                        textStyle: const TextStyle(
-                          fontSize: 16,
+                        const SizedBox(
+                          width: 20,
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        GFButton(
+                          onPressed: () => controller.box.remove('userinfo'),
+                          text: "重置",
+                          size: GFSize.LARGE,
+                          shape: GFButtonShape.square,
+                          type: GFButtonType.outline2x,
+                          color: Colors.white,
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

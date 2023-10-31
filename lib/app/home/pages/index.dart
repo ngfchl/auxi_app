@@ -1,7 +1,7 @@
 library pages;
 
 export 'dashboard.dart';
-export 'search.dart';
+export 'download.dart';
+export 'mysite.dart';
 export 'setting.dart';
-export './site.dart';
 export 'task.dart';

@@ -15,14 +15,14 @@ class LoginController extends GetxController {
 
   bool isServerEdit = false;
   final box = GetStorage();
-  List<String> serverList = [...SPUtil.getStringList('ServerList')] ?? [];
+  List<String> serverList = [...SPUtil.getStringList('ServerList')];
   TextEditingController serverController =
-  TextEditingController(text: 'http://127.0.0.1:8080');
+      TextEditingController(text: 'http://127.0.0.1:8080');
 
   TextEditingController usernameController =
-  TextEditingController(text: 'admin');
+      TextEditingController(text: 'admin');
   TextEditingController passwordController =
-  TextEditingController(text: 'adminadmin');
+      TextEditingController(text: 'adminadmin');
 
   void doLogin() async {
     String baseUrl = SPUtil.getString('server') ?? '';
@@ -44,25 +44,24 @@ class LoginController extends GetxController {
     try {
       await DioClient()
           .post(Api.LOGIN_URL, formData: loginUser.toJson())
-          .then((res) =>
-      {
-        if (res.data['code'] != 0)
-          {
-            Get.snackbar('登录失败', res.data['msg']),
-          }
-        else
-          {
-            box.write("userinfo", res.data['data']),
-            SPUtil.setString("server", serverController.text),
-            box.write("isLogin", true),
-            box.write("isChecked", isChecked),
-            if (isChecked)
-              {
-                box.write('userData', loginUser.toJson()),
-              },
-            Get.offNamed(Routes.HOME)
-          }
-      });
+          .then((res) => {
+                if (res.data['code'] != 0)
+                  {
+                    Get.snackbar('登录失败', res.data['msg']),
+                  }
+                else
+                  {
+                    SPUtil.setMap("userinfo", res.data['data']),
+                    SPUtil.setString("server", serverController.text),
+                    SPUtil.setBool("isLogin", true),
+                    box.write("isChecked", isChecked),
+                    if (isChecked)
+                      {
+                        box.write('userData', loginUser.toJson()),
+                      },
+                    Get.offNamed(Routes.HOME)
+                  }
+              });
     } catch (e, stackTrace) {
       print(stackTrace.toString());
       Get.snackbar('登录失败', e.toString());

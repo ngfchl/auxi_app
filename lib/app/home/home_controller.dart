@@ -4,19 +4,17 @@ import 'package:get/get.dart';
 import 'pages/index.dart';
 
 class HomeController extends GetxController {
-  //TODO: Implement HomeController
-
   var initPage = 2.obs;
 
   final PageController pageController = PageController(initialPage: 2);
   final List<BottomNavigationBarItem> menuItems = [
     const BottomNavigationBarItem(
-      icon: Icon(Icons.search_sharp),
-      label: '搜索',
+      icon: Icon(Icons.task),
+      label: '计划任务',
     ),
     const BottomNavigationBarItem(
-      icon: Icon(Icons.data_thresholding),
-      label: '数据',
+      icon: Icon(Icons.settings_input_composite_sharp),
+      label: '我的站点',
     ),
     const BottomNavigationBarItem(
       icon: Icon(Icons.home),
@@ -24,19 +22,19 @@ class HomeController extends GetxController {
     ),
     const BottomNavigationBarItem(
       icon: Icon(Icons.task_outlined),
-      label: '任务',
+      label: '下载器',
     ),
     const BottomNavigationBarItem(
       icon: Icon(Icons.settings),
-      label: '设置',
+      label: '系统设置',
     ),
   ];
 
   final List<Widget> pages = [
-    const SearchPage(),
-    const SitePage(),
-    const DashBoard(),
     const TaskPage(),
+    const MySitePage(),
+    const DashBoard(),
+    const DownloadPage(),
     const SettingPage(),
   ];
 

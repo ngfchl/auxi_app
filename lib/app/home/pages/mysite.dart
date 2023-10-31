@@ -1,42 +1,79 @@
+import 'package:auxi_app/common/glass_widget.dart';
 import 'package:bruno/bruno.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:proper_filesize/proper_filesize.dart';
 
-import '../../../utils/calc_weeks.dart';
-import '../../../utils/format_number.dart';
-import '../home/models/site_status.dart';
-import 'dashboard_controller.dart';
+import '../../../../../utils/calc_weeks.dart';
+import '../../../../../utils/format_number.dart';
+import '../../../api/mysite.dart';
+import '../models/site_status.dart';
 
-class DashboardView extends GetView<DashboardController> {
-  const DashboardView({Key? key}) : super(key: key);
+class MySitePage extends StatefulWidget {
+  const MySitePage({super.key, param});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _MySitePageState();
+  }
+}
+
+class _MySitePageState extends State<MySitePage>
+    with AutomaticKeepAliveClientMixin {
+  List<SiteStatus> statusList = [];
+  bool isLoaded = false;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    getSiteStatusList().then((value) {
+      if (value.code == 0) {
+        setState(() {
+          statusList = value.data;
+          isLoaded = true;
+        });
+      } else {
+        GFToast.showToast(
+          value.msg,
+          context,
+          backgroundColor: GFColors.SECONDARY,
+        );
+      }
+    }).catchError((e) => GFToast.showToast(e.toString(), context));
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        title: const Text(
-          '主页',
-          style: TextStyle(
-            fontSize: 18,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        toolbarHeight: 20,
+      // appBar: AppBar(
+      //   title: const Text(
+      //     '主页',
+      //     style: TextStyle(
+      //       fontSize: 18,
+      //     ),
+      //   ),
+      //   backgroundColor: Colors.transparent,
+      //   toolbarHeight: 20,
+      // ),
+      body: GlassWidget(
+        child: isLoaded
+            ? ListView.builder(
+                itemCount: statusList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  SiteStatus siteStatus = statusList[index];
+                  return showSiteDataInfo(siteStatus);
+                })
+            : const GFLoader(
+                type: GFLoaderType.circle,
+              ),
       ),
-      body: controller.isLoaded
-          ? ListView.builder(
-              itemCount: controller.statusList.length,
-              itemBuilder: (BuildContext context, int index) {
-                SiteStatus siteStatus = controller.statusList[index];
-                return showSiteDataInfo(siteStatus);
-              })
-          : const GFLoader(
-              type: GFLoaderType.circle,
-            ),
       floatingActionButton: GFIconButton(
         icon: const Icon(Icons.add),
         shape: GFIconButtonShape.circle,
@@ -292,7 +329,7 @@ class DashboardView extends GetView<DashboardController> {
     ];
     return GFCard(
       boxFit: BoxFit.cover,
-      color: Colors.teal[400],
+      color: Colors.teal[300],
       // image: Image.asset('your asset image'),
       title: GFListTile(
         padding: const EdgeInsets.all(0.0),
@@ -324,7 +361,7 @@ class DashboardView extends GetView<DashboardController> {
                 position: GFBadgePosition.topStart(top: 8, start: 24),
                 child: GFIconButton(
                   onPressed: () {
-                    Get.snackbar("打开邮件链接", "打开邮件链接");
+                    GFToast.showToast('打开邮件链接！', context);
                   },
                   icon: const Icon(
                     Icons.mail_outline,
@@ -347,59 +384,62 @@ class DashboardView extends GetView<DashboardController> {
                     ? null
                     : () {
                         if (siteStatus.nextLevelLevel == null) {
-                          Get.snackbar('', '还没有配置本站点的用户等级信息！');
+                          GFToast.showToast('还没有配置本站点的用户等级信息！', context);
                           return;
                         }
-                        Get.defaultDialog(
+                        showDialog(
+                          context: context,
                           barrierDismissible: true,
-                          content: BrnDialog(
-                            divider: const Divider(
-                              height: 0,
-                              color: Colors.transparent,
-                            ),
-                            themeData: BrnDialogConfig(
-                              dividerPadding: const EdgeInsets.all(0),
-                              mainActionBackgroundColor: Colors.teal.shade600,
-                              backgroundColor: Colors.teal.shade600,
-                              mainActionTextStyle: BrnTextStyle(
-                                color: Colors.white70,
+                          builder: (BuildContext dialogContext) {
+                            return BrnDialog(
+                              divider: const Divider(
+                                height: 0,
+                                color: Colors.transparent,
                               ),
-                            ),
-                            contentWidget: GFCard(
-                              boxFit: BoxFit.cover,
-                              color: Colors.transparent,
-                              title: GFListTile(
-                                title: Text(
-                                  '当前等级：${siteStatus.statusMyLevel}',
-                                  style: const TextStyle(
-                                    color: Colors.orange,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                subTitle: Text(
-                                  '下一等级：${siteStatus.nextLevelLevel}',
-                                  style: const TextStyle(
-                                    color: Colors.deepOrange,
-                                    fontSize: 13,
-                                  ),
+                              themeData: BrnDialogConfig(
+                                dividerPadding: const EdgeInsets.all(0),
+                                mainActionBackgroundColor: Colors.teal.shade600,
+                                backgroundColor: Colors.teal.shade600,
+                                mainActionTextStyle: BrnTextStyle(
+                                  color: Colors.white70,
                                 ),
                               ),
-                              content: BrnEnhanceNumberCard(
-                                rowCount: 1,
-                                padding: const EdgeInsets.all(0),
-                                itemChildren: levelInfoList,
-                                backgroundColor: Colors.transparent,
-                                themeData: BrnEnhanceNumberCardConfig(
-                                    titleTextStyle: BrnTextStyle(
-                                        color: Colors.white, fontSize: 20),
-                                    descTextStyle: BrnTextStyle(
-                                        color: Colors.white70, fontSize: 12)),
+                              contentWidget: GFCard(
+                                boxFit: BoxFit.cover,
+                                color: Colors.transparent,
+                                title: GFListTile(
+                                  title: Text(
+                                    '当前等级：${siteStatus.statusMyLevel}',
+                                    style: const TextStyle(
+                                      color: Colors.orange,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  subTitle: Text(
+                                    '下一等级：${siteStatus.nextLevelLevel}',
+                                    style: const TextStyle(
+                                      color: Colors.deepOrange,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ),
+                                content: BrnEnhanceNumberCard(
+                                  rowCount: 1,
+                                  padding: const EdgeInsets.all(0),
+                                  itemChildren: levelInfoList,
+                                  backgroundColor: Colors.transparent,
+                                  themeData: BrnEnhanceNumberCardConfig(
+                                      titleTextStyle: BrnTextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                      descTextStyle: BrnTextStyle(
+                                          color: Colors.white70, fontSize: 12)),
+                                ),
                               ),
-                            ),
-                            actionsText: const [
-                              '确定',
-                            ],
-                          ),
+                              actionsText: const [
+                                '确定',
+                              ],
+                            );
+                          },
                         );
                       },
                 size: GFSize.SMALL,

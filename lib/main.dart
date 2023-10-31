@@ -1,3 +1,4 @@
+import 'package:auxi_app/utils/logger_helper.dart';
 import 'package:auxi_app/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,6 +28,17 @@ void main() async {
         getPages: AppPages.routes,
         routingCallback: (routing) {
           print('当前路由：${routing!.current.toString()}');
+          if (routing.current.toString() == Routes.HOME) {
+            final isLogin = SPUtil.getBool('isLogin');
+            Logger.instance.w(isLogin);
+            Logger.instance.w(Routes.HOME);
+            if (!isLogin!) {
+              String msg = "用户未登录，跳转到登录页！";
+              Logger.instance.w(msg);
+              Get.snackbar('提示', msg);
+              // Get.toNamed(Routes.LOGIN);
+            }
+          }
         }),
   );
 }
