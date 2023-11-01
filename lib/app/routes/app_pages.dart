@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../middleware/login_middleware.dart';
 import '../home/home_binding.dart';
 import '../home/home_view.dart';
 import '../login/login_binding.dart';
@@ -21,6 +22,9 @@ class AppPages {
       name: _Paths.HOME,
       page: () => HomeView(),
       binding: HomeBinding(),
+      middlewares: [
+        LoginMiddleware(),
+      ],
     ),
     GetPage(
       name: _Paths.LOGIN,
@@ -31,6 +35,9 @@ class AppPages {
       name: _Paths.SEARCH,
       page: () => const SearchView(),
       binding: SearchBinding(),
+      middlewares: [
+        LoginMiddleware(),
+      ],
     ),
   ];
 }

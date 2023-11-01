@@ -35,7 +35,7 @@ void main() async {
             if (!isLogin!) {
               String msg = "用户未登录，跳转到登录页！";
               Logger.instance.w(msg);
-              Get.snackbar('提示', msg);
+              // Get.snackbar('提示', msg);
               // Get.toNamed(Routes.LOGIN);
             }
           }
