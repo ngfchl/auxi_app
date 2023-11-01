@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../../../utils/http.dart';
+import '../../api/api.dart';
+import '../../models/login_user.dart';
 import '../../utils/storage.dart';
-import '../api.dart';
-import '../data/login_user.dart';
 import '../routes/app_pages.dart';
 
 class LoginController extends GetxController {

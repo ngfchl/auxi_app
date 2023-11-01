@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:get_storage/get_storage.dart';
 
-import '../app/data/authinfo.dart';
+import '../models/authinfo.dart';
 import 'logger_helper.dart';
 
 class DioClient {
@@ -23,7 +23,7 @@ class DioClient {
   final box = GetStorage();
 
   void _init() {
-    String baseUrl = SPUtil.getString("server") ?? '';
+    String baseUrl = '${SPUtil.getString("server") ?? ''}/api/';
     Logger.instance.i(baseUrl);
     BaseOptions options = BaseOptions(
       //请求基地址,可以包含子路径

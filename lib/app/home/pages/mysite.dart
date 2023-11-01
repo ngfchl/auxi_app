@@ -52,16 +52,6 @@ class _MySitePageState extends State<MySitePage>
     super.build(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
-      // appBar: AppBar(
-      //   title: const Text(
-      //     '主页',
-      //     style: TextStyle(
-      //       fontSize: 18,
-      //     ),
-      //   ),
-      //   backgroundColor: Colors.transparent,
-      //   toolbarHeight: 20,
-      // ),
       body: GlassWidget(
         child: isLoaded
             ? ListView.builder(

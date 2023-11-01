@@ -1,6 +1,5 @@
-
 import '../../utils/http.dart';
-import '../app/data/login_user.dart';
+import '../models/login_user.dart';
 
 /// 用户
 class UserAPI {

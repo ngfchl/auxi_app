@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import 'pages/index.dart';
 
 class HomeController extends GetxController {
-  var initPage = 2.obs;
+  var initPage = 3.obs;
 
-  final PageController pageController = PageController(initialPage: 2);
+  final PageController pageController = PageController(initialPage: 3);
   final List<BottomNavigationBarItem> menuItems = [
     const BottomNavigationBarItem(
       icon: Icon(Icons.task),

@@ -1,8 +1,7 @@
 import '../../utils/http.dart';
-import '../app/api.dart';
-import '../app/data/CommonResponse.dart';
 import '../app/home/models/site_status.dart';
-
+import '../models/CommonResponse.dart';
+import 'api.dart';
 
 Future<CommonResponse> getSiteStatusList() async {
   final response = await DioClient().get(Api.MYSITE_STATUS_LIST);
