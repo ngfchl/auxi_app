@@ -28,6 +28,8 @@ dependencies:
       url: https://github.com/Bungeefan/logger.git
   glassmorphism: ^3.0.0
   glassmorphism_ui: ^0.3.0
+  qbittorrent_api: ^1.0.6
+  transmission_api: ^0.0.1
 
 dev_dependencies:
   flutter_test:
