@@ -49,8 +49,7 @@ class DioClient {
     ));
   }
 
-  Future<Response> get(
-    String url, {
+  Future<Response> get(String url, {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
@@ -61,8 +60,7 @@ class DioClient {
     return response;
   }
 
-  Future<Response> post(
-    String url, {
+  Future<Response> post(String url, {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? formData,
     Options? options,
@@ -78,8 +76,7 @@ class DioClient {
     return resp;
   }
 
-  Future<Response> put(
-    String url, {
+  Future<Response> put(String url, {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? formData,
     Options? options,
@@ -92,8 +89,7 @@ class DioClient {
     );
   }
 
-  Future<Response> delete(
-    String url, {
+  Future<Response> delete(String url, {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? formData,
     Options? options,
@@ -121,7 +117,7 @@ class DioClient {
   }
 
   Future<Options> _buildRequestOptions() async {
-    Map userinfo = box.read('userinfo') ?? {};
+    Map userinfo = SPUtil.getMap('userinfo');
 
     if (userinfo.isNotEmpty) {
       AuthInfo authInfo = AuthInfo.fromJson(userinfo as Map<String, dynamic>);
