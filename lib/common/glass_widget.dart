@@ -58,7 +58,7 @@ class GlassWidget extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.white.withOpacity(0.2),
+              Colors.teal.withOpacity(0.2),
               Colors.blue.withOpacity(0.3),
             ],
           ),
