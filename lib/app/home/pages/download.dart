@@ -3,15 +3,14 @@ import 'dart:async';
 import 'package:bruno/bruno.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
-import 'package:qbittorrent_api/qbittorrent_api.dart';
-import 'package:transmission_api/transmission_api.dart';
 
 import '../../../api/downloader.dart';
 import '../../../common/glass_widget.dart';
 import '../../../models/download.dart';
-import '../../../models/transmission.dart';
 import '../../../utils/logger_helper.dart' as LoggerHelper;
+import 'controller/download_controller.dart';
 
 class DownloadPage extends StatefulWidget {
   const DownloadPage({super.key});
@@ -22,9 +21,10 @@ class DownloadPage extends StatefulWidget {
 
 class _DownloadPageState
     extends State<DownloadPage> // with AutomaticKeepAliveClientMixin
-{
+    {
   bool isLoaded = false;
   List<Downloader> dataList = [];
+  DownloadController controller = Get.put(DownloadController());
 
   // @override
   // bool get wantKeepAlive => true;
@@ -62,7 +62,7 @@ class _DownloadPageState
         ),
         title: Text(downloader.name),
         subTitle:
-            Text('${downloader.http}://${downloader.host}:${downloader.port}'),
+        Text('${downloader.http}://${downloader.host}:${downloader.port}'),
       ),
       content: getSpeedInfo(downloader),
       // buttonBar: GFButtonBar(
@@ -102,14 +102,14 @@ class _DownloadPageState
         //     }),
         child: isLoaded
             ? ListView.builder(
-                itemCount: dataList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  Downloader downloader = dataList[index];
-                  return buildDownloaderCard(downloader);
-                })
+            itemCount: dataList.length,
+            itemBuilder: (BuildContext context, int index) {
+              Downloader downloader = dataList[index];
+              return buildDownloaderCard(downloader);
+            })
             : const GFLoader(
-                type: GFLoaderType.circle,
-              ),
+          type: GFLoaderType.circle,
+        ),
       ),
       floatingActionButton: GFIconButton(
         icon: const Icon(Icons.add),
@@ -144,8 +144,8 @@ class _DownloadPageState
   getSpeedInfo(downloader) {
     return FutureBuilder(
         future: downloader.category == 'Qb'
-            ? getQbSpeed(downloader)
-            : getTrSpeed(downloader),
+            ? controller.getQbSpeed(downloader)
+            : controller.getTrSpeed(downloader),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             LoggerHelper.Logger.instance.w(snapshot.data);
@@ -201,32 +201,4 @@ class _DownloadPageState
         });
   }
 
-  getQbSpeed(Downloader downloader) async {
-    final qbittorent = QBittorrentApiV2(
-      baseUrl: '${downloader.http}://${downloader.host}:${downloader.port}',
-      cookiePath: '.',
-      logger: true,
-    );
-    await qbittorent.auth.login(
-      username: downloader.username!,
-      password: downloader.password!,
-    );
-    TransferInfo res = await qbittorent.transfer.getGlobalTransferInfo();
-    LoggerHelper.Logger.instance.w(res.connectionStatus);
-
-    return res;
-  }
-
-  getTrSpeed(Downloader downloader) async {
-    final transmission = Transmission(
-      '${downloader.http}://${downloader.host}:${downloader.port}',
-      AuthKeys(downloader.username!, downloader.password!),
-    );
-    var res = await transmission.v1.session.sessionStats();
-    LoggerHelper.Logger.instance.w(res);
-    if (res['result'] == "success") {
-      return TransmissionStats.fromJson(res["arguments"]);
-    }
-    return res;
-  }
 }
