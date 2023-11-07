@@ -574,6 +574,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0"
+  transfer_list:
+    dependency: "direct main"
+    description:
+      name: transfer_list
+      sha256: "53dbe579f9bca8d8022ead83e3d8608cba23f12b20bb400d5edc85e7941b91e6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   transmission_api:
     dependency: "direct main"
     description:

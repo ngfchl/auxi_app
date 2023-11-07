@@ -30,6 +30,7 @@ dependencies:
   glassmorphism_ui: ^0.3.0
   qbittorrent_api: ^1.0.6
   transmission_api: ^0.0.1
+  transfer_list: ^0.0.2
 
 dev_dependencies:
   flutter_test:
