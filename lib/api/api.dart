@@ -16,4 +16,60 @@ class Api {
 
   // 下载器速度列表
   static const String DOWNLOADER_SPEED_URL = "download/downloaders/speed";
+
+// export const $taskExecute: (task_id: number) => Promise<any> = async (task_id: number) => {
+// return await getList<object, Task>('schedule/exec', { task_id })
+// }
+// export const $scheduleList: () => Promise<any> = async () => {
+// return await getList<null, Schedule[]>()
+// }
+//
+// export const $schedule: (params: object) => Promise<any> = async (params: object) => {
+// return await getList<object, Schedule>('schedule/schedule', params)
+// }
+// export const $crontabList: () => Promise<any> = async () => {
+// return await getList<null, Crontab[]>('schedule/crontabs')
+// }
+//
+// export const $addSchedule = async (schedule: ScheduleForm) => {
+// const { msg, code } = await usePost('schedule/schedule', schedule)
+// switch (code) {
+// case 0:
+// message?.success(msg)
+// return true
+// default:
+// message?.error(msg)
+// return false
+// }
+// }
+//
+// export const $editSchedule = async (schedule: ScheduleForm) => {
+// const { msg, code } = await usePut('schedule/schedule', schedule)
+// switch (code) {
+// case 0:
+// message?.success(msg)
+// return true
+// default:
+// message?.error(msg)
+// return false
+// }
+// }
+//
+// export const $removeSchedule = async (params: object) => {
+// const { msg, code } = await useDelete('schedule/schedule', params)
+// switch (code) {
+// case 0:
+// message?.success(msg)
+// return true
+// default:
+// message?.error(msg)
+// return false
+// }
+// }
+
+  // 任务列表
+  static const String TASK_DESC = "schedule/tasks";
+  static const String TASK_LIST = "schedule/schedules";
+  static const String CRONTAB_LIST = "schedule/crontabs";
+  static const String SYSTEM_CONFIG = "config/config";
 }
