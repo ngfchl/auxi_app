@@ -1,12 +1,13 @@
+import 'package:auxi_app/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'pages/index.dart';
 
 class HomeController extends GetxController {
-  var initPage = 3.obs;
-
-  final PageController pageController = PageController(initialPage: 3);
+  var initPage = 1.obs;
+  Map userinfo = {};
+  final PageController pageController = PageController(initialPage: 1);
   final List<BottomNavigationBarItem> menuItems = [
     const BottomNavigationBarItem(
       icon: Icon(Icons.task),
@@ -31,15 +32,17 @@ class HomeController extends GetxController {
   ];
 
   final List<Widget> pages = [
-    const TaskPage(),
+    TaskPage(),
     const MySitePage(),
     const DashBoard(),
     const DownloadPage(),
-    const SettingPage(),
+    SettingPage(),
   ];
 
   @override
   void onInit() {
+    userinfo = SPUtil.getMap('userinfo');
+    update();
     super.onInit();
   }
 

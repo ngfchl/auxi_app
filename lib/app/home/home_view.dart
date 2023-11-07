@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 
-import '../routes/app_pages.dart';
 import 'home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -26,41 +25,115 @@ class HomeView extends GetView<HomeController> {
         },
         children: controller.pages,
       ),
-      drawer: Container(
-        width: 280,
-        color: Colors.purple.withOpacity(0.5),
-        child: Column(
+      drawer: GFDrawer(
+        elevation: 10,
+        color: Colors.teal.withOpacity(0.6),
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            GFButton(
-              onPressed: () {
-                Get.toNamed(Routes.DASHBOARD);
-              },
-              text: 'DASHBOARD',
+            const SizedBox(
+              height: 60,
             ),
-            GFButton(
-              onPressed: () {
-                Get.toNamed(Routes.SEARCH);
-              },
-              text: 'SITE',
+            GFDrawerHeader(
+              centerAlign: true,
+              closeButton: null,
+              decoration: const BoxDecoration(
+                color: Colors.transparent,
+              ),
+              currentAccountPicture: const GFAvatar(
+                radius: 80.0,
+                backgroundImage: NetworkImage(
+                    "https://cdn.pixabay.com/photo/2017/12/03/18/04/christmas-balls-2995437_960_720.jpg"),
+              ),
+              // otherAccountsPictures: [
+              //   Image(
+              //     image: NetworkImage(
+              //         "https://cdn.pixabay.com/photo/2019/12/20/00/03/road-4707345_960_720.jpg"),
+              //     fit: BoxFit.cover,
+              //   ),
+              //   GFAvatar(
+              //     child: Text("ab"),
+              //   )
+              // ],
+              child: Padding(
+                padding: const EdgeInsets.only(right: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      controller.userinfo['user'],
+                      style: const TextStyle(
+                        color: Colors.white70,
+                      ),
+                    ),
+                    // Text('admin@admin.com'),
+                  ],
+                ),
+              ),
             ),
-            GFButton(
-              onPressed: () {
-                Get.toNamed(Routes.TASK);
-              },
-              text: 'TASK',
+            ListTile(
+              title: const Text(
+                '仪表盘',
+                style: TextStyle(
+                  color: Colors.white70,
+                ),
+              ),
+              onTap: () {},
             ),
-            GFButton(
-              onPressed: () {
-                Get.toNamed(Routes.SETTING);
-              },
-              text: 'SETTING',
+            ListTile(
+              title: const Text(
+                '系统设置',
+                style: TextStyle(
+                  color: Colors.white70,
+                ),
+              ),
+              onTap: () {},
             ),
-            GFButton(
-              onPressed: () {
-                Get.toNamed(Routes.SEARCH);
-                Get.snackbar('title', 'message');
-              },
-              text: 'SEARCH',
+            ListTile(
+              title: const Text(
+                '修改密码',
+                style: TextStyle(
+                  color: Colors.white70,
+                ),
+              ),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text(
+                '运行日志',
+                style: TextStyle(
+                  color: Colors.white70,
+                ),
+              ),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text(
+                '支持站点',
+                style: TextStyle(
+                  color: Colors.white70,
+                ),
+              ),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text(
+                '反馈帮助',
+                style: TextStyle(
+                  color: Colors.white70,
+                ),
+              ),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text(
+                '关于',
+                style: TextStyle(
+                  color: Colors.white70,
+                ),
+              ),
+              onTap: () {},
             ),
           ],
         ),
@@ -69,7 +142,7 @@ class HomeView extends GetView<HomeController> {
       drawerScrimColor: Colors.white.withOpacity(0.6),
       floatingActionButton: GFIconButton(
         icon: const Icon(Icons.menu_outlined),
-        color: Colors.teal.shade100,
+        color: Colors.teal.shade700,
         size: 18,
         onPressed: () {
           _globalKey.currentState?.openDrawer();

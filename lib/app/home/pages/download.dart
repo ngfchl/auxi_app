@@ -21,7 +21,7 @@ class DownloadPage extends StatefulWidget {
 
 class _DownloadPageState
     extends State<DownloadPage> // with AutomaticKeepAliveClientMixin
-    {
+{
   bool isLoaded = false;
   List<Downloader> dataList = [];
   DownloadController controller = Get.put(DownloadController());
@@ -53,6 +53,7 @@ class _DownloadPageState
     return GFCard(
       padding: const EdgeInsets.only(left: 0, right: 0, bottom: 15),
       boxFit: BoxFit.cover,
+      color: Colors.transparent,
       title: GFListTile(
         padding: const EdgeInsets.all(0),
         avatar: GFAvatar(
@@ -62,7 +63,7 @@ class _DownloadPageState
         ),
         title: Text(downloader.name),
         subTitle:
-        Text('${downloader.http}://${downloader.host}:${downloader.port}'),
+            Text('${downloader.http}://${downloader.host}:${downloader.port}'),
       ),
       content: getSpeedInfo(downloader),
       // buttonBar: GFButtonBar(
@@ -102,22 +103,22 @@ class _DownloadPageState
         //     }),
         child: isLoaded
             ? ListView.builder(
-            itemCount: dataList.length,
-            itemBuilder: (BuildContext context, int index) {
-              Downloader downloader = dataList[index];
-              return buildDownloaderCard(downloader);
-            })
+                itemCount: dataList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  Downloader downloader = dataList[index];
+                  return buildDownloaderCard(downloader);
+                })
             : const GFLoader(
-          type: GFLoaderType.circle,
-        ),
+                type: GFLoaderType.circle,
+              ),
       ),
       floatingActionButton: GFIconButton(
         icon: const Icon(Icons.add),
-        shape: GFIconButtonShape.circle,
-        color: GFColors.SECONDARY,
+        shape: GFIconButtonShape.standard,
+        color: GFColors.PRIMARY.withOpacity(0.6),
         onPressed: () {
           GFToast.showToast(
-            '添加站点',
+            '添加下载器',
             context,
             backgroundColor: GFColors.SECONDARY,
             toastBorderRadius: 5.0,
@@ -158,12 +159,12 @@ class _DownloadPageState
               items = [
                 BrnNumberInfoItemModel(
                   title: '上传',
-                  number: filesize(res.upInfoSpeed!.toString(), 0),
+                  number: '${filesize(res.upInfoSpeed!.toString(), 0)}/S',
                   lastDesc: filesize(res.upInfoData),
                 ),
                 BrnNumberInfoItemModel(
                   title: '下载',
-                  number: filesize(res.dlInfoSpeed!.toString(), 0),
+                  number: '${filesize(res.dlInfoSpeed!.toString(), 0)}/S',
                   lastDesc: filesize(res.dlInfoData),
                 ),
                 BrnNumberInfoItemModel(
@@ -193,6 +194,7 @@ class _DownloadPageState
               ];
             }
             return BrnEnhanceNumberCard(
+              backgroundColor: Colors.transparent,
               rowCount: 2,
               itemChildren: items,
             );
@@ -200,5 +202,4 @@ class _DownloadPageState
           return const Text('下载器链接失败！');
         });
   }
-
 }

@@ -26,6 +26,19 @@ class TaskPage extends StatelessWidget {
           children: _buildTaskList(),
         ),
       ),
+      floatingActionButton: GFIconButton(
+        icon: const Icon(Icons.add),
+        shape: GFIconButtonShape.standard,
+        color: GFColors.PRIMARY.withOpacity(0.6),
+        onPressed: () {
+          GFToast.showToast(
+            '添加任务',
+            context,
+            backgroundColor: GFColors.PRIMARY,
+            toastBorderRadius: 5.0,
+          );
+        },
+      ),
     );
   }
 
@@ -325,6 +338,25 @@ class TaskPage extends StatelessWidget {
                           text: '开启',
                           size: GFSize.SMALL,
                         ),
+                  GFButton(
+                    onPressed: () {
+                      Get.defaultDialog(
+                        title: '运行任务',
+                        middleText: '确定要运行？',
+                        onCancel: () {
+                          Get.back();
+                        },
+                        onConfirm: () {
+                          Get.snackbar('运行任务', '运行任务？');
+                        },
+                        textCancel: '取消',
+                        textConfirm: '确定',
+                      );
+                    },
+                    text: '运行',
+                    size: GFSize.SMALL,
+                    color: GFColors.SECONDARY,
+                  ),
                   GFButton(
                     onPressed: () {
                       editTask(item);

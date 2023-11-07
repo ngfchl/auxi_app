@@ -66,8 +66,8 @@ class _MySitePageState extends State<MySitePage>
       ),
       floatingActionButton: GFIconButton(
         icon: const Icon(Icons.add),
-        shape: GFIconButtonShape.circle,
-        color: GFColors.SECONDARY,
+        shape: GFIconButtonShape.standard,
+        color: GFColors.PRIMARY.withOpacity(0.6),
         onPressed: () {
           GFToast.showToast(
             '添加站点',
