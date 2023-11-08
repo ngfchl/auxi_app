@@ -1,6 +1,6 @@
 import '../../utils/http.dart';
 import '../app/home/models/site_status.dart';
-import '../models/CommonResponse.dart';
+import '../models/common_response.dart';
 import 'api.dart';
 
 Future<CommonResponse> getSiteStatusList() async {

@@ -1,4 +1,4 @@
-import '../models/CommonResponse.dart';
+import '../models/common_response.dart';
 import '../models/download.dart';
 import '../utils/http.dart';
 import 'api.dart';
