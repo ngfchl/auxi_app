@@ -1,5 +1,6 @@
 import 'package:auxi_app/common/glass_widget.dart';
 import 'package:bruno/bruno.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
@@ -54,12 +55,17 @@ class _MySitePageState extends State<MySitePage>
       backgroundColor: Colors.transparent,
       body: GlassWidget(
         child: isLoaded
-            ? ListView.builder(
-                itemCount: statusList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  SiteStatus siteStatus = statusList[index];
-                  return showSiteDataInfo(siteStatus);
-                })
+            ? EasyRefresh(
+                onRefresh: () async {
+                  await getSiteStatusList();
+                },
+                child: ListView.builder(
+                    itemCount: statusList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      SiteStatus siteStatus = statusList[index];
+                      return showSiteDataInfo(siteStatus);
+                    }),
+              )
             : const GFLoader(
                 type: GFLoaderType.circle,
               ),

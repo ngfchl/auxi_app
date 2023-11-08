@@ -1,6 +1,5 @@
-import 'dart:async';
-
 import 'package:bruno/bruno.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -61,9 +60,20 @@ class _DownloadPageState
           backgroundImage: AssetImage(
               'assets/images/${downloader.category.toLowerCase()}.png'),
         ),
-        title: Text(downloader.name),
-        subTitle:
-            Text('${downloader.http}://${downloader.host}:${downloader.port}'),
+        title: Text(
+          downloader.name,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
+        ),
+        subTitle: Text(
+          '${downloader.http}://${downloader.host}:${downloader.port}',
+          style: const TextStyle(
+            color: Colors.white70,
+          ),
+        ),
       ),
       content: getSpeedInfo(downloader),
       // buttonBar: GFButtonBar(
@@ -102,12 +112,29 @@ class _DownloadPageState
         //       }
         //     }),
         child: isLoaded
-            ? ListView.builder(
-                itemCount: dataList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  Downloader downloader = dataList[index];
-                  return buildDownloaderCard(downloader);
-                })
+            ? EasyRefresh(
+                controller: EasyRefreshController(),
+                onRefresh: () async {
+                  // controller.getDownloaderListFromServer();
+                  getDownloaderList().then((value) {
+                    if (value.code == 0) {
+                      dataList = value.data;
+                      isLoaded = true;
+                    } else {
+                      Get.snackbar('', value.msg.toString());
+                    }
+                  }).catchError((e) {
+                    Get.snackbar('', e.toString());
+                  });
+                  controller.update();
+                },
+                child: ListView.builder(
+                    itemCount: dataList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      Downloader downloader = dataList[index];
+                      return buildDownloaderCard(downloader);
+                    }),
+              )
             : const GFLoader(
                 type: GFLoaderType.circle,
               ),
@@ -128,20 +155,6 @@ class _DownloadPageState
     );
   }
 
-  getIntervalSpeed(Downloader downloader, int duration) async {
-    Duration period = Duration(seconds: duration);
-    int count = 0;
-
-    Timer.periodic(period, (timer) async {
-      //到时回调
-      LoggerHelper.Logger.instance.w('afterTimer =  ${DateTime.now()}');
-      count++;
-      if (count >= 5) {
-        timer.cancel();
-      }
-    });
-  }
-
   getSpeedInfo(downloader) {
     return FutureBuilder(
         future: downloader.category == 'Qb'
@@ -150,30 +163,65 @@ class _DownloadPageState
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             LoggerHelper.Logger.instance.w(snapshot.data);
-            var res = snapshot.data;
-            if (res == null) {
-              return const Text('当前下载器链接失败！');
+            if (snapshot.data == null) {
+              return const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.electrical_services,
+                    color: Colors.white70,
+                  ),
+                  Text(
+                    '正在连接...',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              );
             }
+            var res = snapshot.data.data;
             List<BrnNumberInfoItemModel> items = [];
             if (downloader.category == 'Qb') {
               items = [
                 BrnNumberInfoItemModel(
                   title: '上传',
-                  number: '${filesize(res.upInfoSpeed!.toString(), 0)}/S',
+                  // topWidget: Row(
+                  //   children: [
+                  //     Text(
+                  //       '${filesize(res.upInfoSpeed!, 0)}/S',
+                  //       style: const TextStyle(
+                  //         fontSize: 20,
+                  //         fontWeight: FontWeight.w300,
+                  //         color: Colors.white70,
+                  //       ),
+                  //     ),
+                  //     Text(
+                  //       filesize(res.upInfoData),
+                  //       style: const TextStyle(
+                  //         fontWeight: FontWeight.w300,
+                  //         color: Colors.white70,
+                  //       ),
+                  //     )
+                  //   ],
+                  // ),
+                  number: '${filesize(res.upInfoSpeed!.toString(), 0)}/S ',
                   lastDesc: filesize(res.upInfoData),
                 ),
                 BrnNumberInfoItemModel(
                   title: '下载',
-                  number: '${filesize(res.dlInfoSpeed!.toString(), 0)}/S',
+                  number: '${filesize(res.dlInfoSpeed!.toString(), 0)}/S ',
                   lastDesc: filesize(res.dlInfoData),
                 ),
                 BrnNumberInfoItemModel(
                   title: '上传限速',
-                  number: "${filesize(res.upRateLimit!.toString())}/S",
+                  number: "${filesize(res.upRateLimit!.toString())}/S ",
                 ),
                 BrnNumberInfoItemModel(
                   title: '下载限速',
-                  number: "${filesize(res.dlInfoSpeed!.toString())}/S",
+                  number: "${filesize(res.dlInfoSpeed!.toString())}/S ",
                 ),
               ];
             } else {
@@ -191,13 +239,30 @@ class _DownloadPageState
                   lastDesc: filesize(res.currentStats.uploadedBytes),
                   // preDesc: '${filesize(res.dlRateLimit)}/S',
                 ),
+                BrnNumberInfoItemModel(
+                  title: '活动种子',
+                  number: res.activeTorrentCount!.toString(),
+                  lastDesc: res.torrentCount!.toString(),
+                ),
+                BrnNumberInfoItemModel(
+                  title: '暂停种子',
+                  number: res.pausedTorrentCount!.toString(),
+                ),
               ];
             }
             return BrnEnhanceNumberCard(
-              backgroundColor: Colors.transparent,
-              rowCount: 2,
-              itemChildren: items,
-            );
+                backgroundColor: Colors.transparent,
+                rowCount: 2,
+                itemChildren: items,
+                themeData: BrnEnhanceNumberCardConfig(
+                  descTextStyle: BrnTextStyle(
+                    color: Colors.white70,
+                  ),
+                  titleTextStyle: BrnTextStyle(
+                    color: Colors.white70,
+                    fontSize: 22,
+                  ),
+                ));
           }
           return const Text('下载器链接失败！');
         });

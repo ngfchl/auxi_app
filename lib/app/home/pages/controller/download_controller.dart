@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:auxi_app/models/common_response.dart';
 import 'package:get/get.dart';
 import 'package:qbittorrent_api/qbittorrent_api.dart';
 import 'package:transmission_api/transmission_api.dart';
@@ -13,6 +16,11 @@ class DownloadController extends GetxController {
 
   @override
   void onInit() {
+    getDownloaderListFromServer();
+    super.onInit();
+  }
+
+  getDownloaderListFromServer() {
     getDownloaderList().then((value) {
       if (value.code == 0) {
         dataList = value.data;
@@ -24,10 +32,9 @@ class DownloadController extends GetxController {
       Get.snackbar('', e.toString());
     });
     update();
-    super.onInit();
   }
 
-  getQbSpeed(Downloader downloader) async {
+  Future getQbSpeed(Downloader downloader) async {
     final qbittorrent = QBittorrentApiV2(
       baseUrl: '${downloader.http}://${downloader.host}:${downloader.port}',
       cookiePath: '.',
@@ -40,10 +47,10 @@ class DownloadController extends GetxController {
     TransferInfo res = await qbittorrent.transfer.getGlobalTransferInfo();
     LoggerHelper.Logger.instance.w(res.connectionStatus);
 
-    return res;
+    return CommonResponse(data: res);
   }
 
-  getTrSpeed(Downloader downloader) async {
+  Future getTrSpeed(Downloader downloader) async {
     final transmission = Transmission(
       '${downloader.http}://${downloader.host}:${downloader.port}',
       AuthKeys(downloader.username!, downloader.password!),
@@ -51,8 +58,36 @@ class DownloadController extends GetxController {
     var res = await transmission.v1.session.sessionStats();
     LoggerHelper.Logger.instance.w(res);
     if (res['result'] == "success") {
-      return TransmissionStats.fromJson(res["arguments"]);
+      return CommonResponse(data: TransmissionStats.fromJson(res["arguments"]));
     }
-    return res;
+    return CommonResponse(
+      code: -1,
+      data: res,
+      msg: '${downloader.name} 获取实时信息失败！',
+    );
+  }
+
+  dynamic getIntervalSpeed(Downloader downloader, {int duration = 5}) {
+    dynamic speedInfo;
+    Timer.periodic(Duration(seconds: duration), (timer) {
+      //到时回调
+      downloader.category == 'Qb'
+          ? getQbSpeed(downloader).then((value) {
+              if (value.code == 0) {
+                speedInfo = value.data;
+              } else {
+                speedInfo = null;
+              }
+            })
+          : getTrSpeed(downloader).then((value) {
+              if (value.code == 0) {
+                speedInfo = value.data;
+              } else {
+                speedInfo = null;
+              }
+            });
+    });
+    LoggerHelper.Logger.instance.w(speedInfo);
+    return speedInfo;
   }
 }

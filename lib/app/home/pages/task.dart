@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:auxi_app/common/glass_widget.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
@@ -22,8 +23,14 @@ class TaskPage extends StatelessWidget {
       //   title: const Text('计划任务'),
       // ),
       body: GlassWidget(
-        child: ListView(
-          children: _buildTaskList(),
+        child: EasyRefresh(
+          onRefresh: () {
+            controller.getTaskInfo();
+            controller.update();
+          },
+          child: ListView(
+            children: _buildTaskList(),
+          ),
         ),
       ),
       floatingActionButton: GFIconButton(
