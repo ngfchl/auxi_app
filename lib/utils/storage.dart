@@ -135,7 +135,7 @@ class SPUtil {
   /// 根据key获取Map类型
   static Map getMap(String key) {
     String jsonStr = _preferences.getString(key) ?? "{}";
-    return jsonStr.isEmpty ? Map : json.decode(jsonStr);
+    return jsonStr.isEmpty ? {} : json.decode(jsonStr);
   }
 
   /// 判断是否是json字符串
