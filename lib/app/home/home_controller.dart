@@ -5,9 +5,11 @@ import 'package:get/get.dart';
 import 'pages/index.dart';
 
 class HomeController extends GetxController {
-  var initPage = 1.obs;
+  var initPage = 2.obs;
   Map userinfo = {};
-  final PageController pageController = PageController(initialPage: 1);
+  TextEditingController searchController = TextEditingController();
+
+  final PageController pageController = PageController(initialPage: 2);
   final List<BottomNavigationBarItem> menuItems = [
     const BottomNavigationBarItem(
       icon: Icon(Icons.task),
@@ -30,6 +32,12 @@ class HomeController extends GetxController {
       label: '系统设置',
     ),
   ];
+
+  @override
+  void onClose() {
+    searchController.dispose();
+    super.onClose();
+  }
 
   final List<Widget> pages = [
     TaskPage(),
