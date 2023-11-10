@@ -1,10 +1,9 @@
 class SearchResult {
-  int? site;
-  int? tid;
+  int? siteId;
+  String? tid;
+  String? poster;
   String? category;
   String? magnetUrl;
-  String? detailUrl;
-  String? posterUrl;
   String? title;
   String? subtitle;
   String? saleStatus;
@@ -15,16 +14,13 @@ class SearchResult {
   int? seeders;
   int? leechers;
   int? completers;
-  String? siteName;
-  String? siteLogo;
 
   SearchResult(
-      {this.site,
+      {this.siteId,
       this.tid,
+      this.poster,
       this.category,
       this.magnetUrl,
-      this.detailUrl,
-      this.posterUrl,
       this.title,
       this.subtitle,
       this.saleStatus,
@@ -34,17 +30,14 @@ class SearchResult {
       this.size,
       this.seeders,
       this.leechers,
-      this.completers,
-      this.siteName,
-      this.siteLogo});
+      this.completers});
 
   SearchResult.fromJson(Map<String, dynamic> json) {
-    site = json['site'];
+    siteId = json['site_id'];
     tid = json['tid'];
+    poster = json['poster'];
     category = json['category'];
     magnetUrl = json['magnet_url'];
-    detailUrl = json['detail_url'];
-    posterUrl = json['poster_url'];
     title = json['title'];
     subtitle = json['subtitle'];
     saleStatus = json['sale_status'];
@@ -55,18 +48,15 @@ class SearchResult {
     seeders = json['seeders'];
     leechers = json['leechers'];
     completers = json['completers'];
-    siteName = json['siteName'];
-    siteLogo = json['siteLogo'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['site'] = site;
+    data['site_id'] = siteId;
     data['tid'] = tid;
+    data['poster'] = poster;
     data['category'] = category;
     data['magnet_url'] = magnetUrl;
-    data['detail_url'] = detailUrl;
-    data['poster_url'] = posterUrl;
     data['title'] = title;
     data['subtitle'] = subtitle;
     data['sale_status'] = saleStatus;
@@ -77,8 +67,6 @@ class SearchResult {
     data['seeders'] = seeders;
     data['leechers'] = leechers;
     data['completers'] = completers;
-    data['siteName'] = siteName;
-    data['siteLogo'] = siteLogo;
     return data;
   }
 }
