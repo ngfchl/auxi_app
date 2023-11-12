@@ -15,22 +15,16 @@ class HomeView extends GetView<HomeController> {
       key: _globalKey,
       backgroundColor: Colors.teal.shade200,
       appBar: GFAppBar(
-        searchBar: true,
-        searchController: controller.searchController,
-        searchHintText: '搜索',
         backgroundColor: Colors.teal.withOpacity(0.3),
-        onSubmitted: (value) {
-          if (value.isNotEmpty) {
-            Get.toNamed(Routes.SEARCH, arguments: value);
-          }
-        },
         actions: <Widget>[
           GFIconButton(
             icon: const Icon(
-              Icons.settings,
+              Icons.search,
               color: Colors.white,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Get.toNamed(Routes.SEARCH);
+            },
             type: GFButtonType.transparent,
           ),
         ],
