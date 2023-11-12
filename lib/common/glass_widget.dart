@@ -17,7 +17,7 @@ class GlassWidget extends StatelessWidget {
         Lottie.asset(
           StringUtils.getLottieByName('五彩纸屑'),
           repeat: true,
-          fit: BoxFit.fill,
+          fit: BoxFit.cover,
         ),
         // GlassmorphicContainer(
         //   width: double.infinity,
@@ -53,7 +53,7 @@ class GlassWidget extends StatelessWidget {
           height: double.infinity,
           width: double.infinity,
           blur: 4,
-          color: Colors.white.withOpacity(0.01),
+          color: Colors.white.withOpacity(0.11),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -66,7 +66,7 @@ class GlassWidget extends StatelessWidget {
           border: const Border.fromBorderSide(BorderSide.none),
           shadowStrength: 5,
           shape: BoxShape.circle,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(2),
           shadowColor: Colors.white.withOpacity(0.24),
           child: child,
         ),
