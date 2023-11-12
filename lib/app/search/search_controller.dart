@@ -18,17 +18,16 @@ import '../home/models/website.dart';
 import '../routes/app_pages.dart';
 
 class SearchPageController extends GetxController {
-  String query = '';
   late WebSocketChannel channel;
   final streamController = StreamController<String>.broadcast();
   TextEditingController searchController = TextEditingController();
 
-  List<SearchResult?> searchList = [];
-  List<String> errList = [];
+  final RxList<SearchResult?> searchList = RxList<SearchResult?>([]);
+  final RxList<Map> errList = RxList<Map>([]);
+  final RxList<int> siteList = RxList<int>([]);
 
   Map<int, WebSite> webSiteList = {};
   List<MySite> mySiteList = [];
-  List<int> siteList = [];
 
   @override
   void onInit() {
@@ -56,7 +55,9 @@ class SearchPageController extends GetxController {
         ? CommonResponse(
             code: 0,
             data: result.data
-                .where((element) => element.searchTorrents == true)
+                .where((MySite element) =>
+                    element.searchTorrents == true &&
+                    webSiteList[element.site]!.searchTorrents == true)
                 .toList())
         : CommonResponse(code: -1, data: []);
   }

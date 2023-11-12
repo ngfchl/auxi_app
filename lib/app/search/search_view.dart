@@ -64,9 +64,105 @@ class SearchView extends GetView<SearchPageController> {
           ),
         ),
         actions: <Widget>[
+          controller.errList.isNotEmpty
+              ? GFIconBadge(
+                  position: GFBadgePosition.topEnd(top: 8, end: -5),
+                  counterChild: GFBadge(
+                    child: Text(controller.errList.length.toString()),
+                  ),
+                  child: GFIconButton(
+                    icon: const Icon(
+                      Icons.message,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    type: GFButtonType.transparent,
+                    size: GFSize.SMALL,
+                    onPressed: () {
+                      Get.bottomSheet(
+                        Container(
+                          color: Colors.teal,
+                          child: Column(
+                            children: [
+                              AppBar(
+                                backgroundColor: Colors.teal,
+                                shadowColor: Colors.teal,
+                                title: const Text(
+                                  '搜索结果',
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                leading: GFIconButton(
+                                  size: GFSize.MEDIUM,
+                                  type: GFButtonType.transparent,
+                                  onPressed: () {
+                                    Get.back();
+                                  },
+                                  icon: const Icon(
+                                    Icons.cleaning_services_rounded,
+                                    color: GFColors.WARNING,
+                                  ),
+                                ),
+                                actions: [
+                                  GFIconButton(
+                                    size: GFSize.MEDIUM,
+                                    type: GFButtonType.transparent,
+                                    onPressed: () {
+                                      Get.back();
+                                    },
+                                    icon: const Icon(
+                                      Icons.done,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Expanded(
+                                child: ListView.builder(
+                                    itemCount: controller.errList.length,
+                                    itemBuilder: (context, index) {
+                                      var item = controller.errList[index];
+                                      return GFListTile(
+                                          title: Text(
+                                            item['msg'],
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                          icon: item['code'] == 0
+                                              ? const Icon(
+                                                  Icons.done,
+                                                  size: 14,
+                                                  color: GFColors.SUCCESS,
+                                                )
+                                              : const Icon(
+                                                  Icons.dangerous_outlined,
+                                                  size: 14,
+                                                  color: GFColors.DANGER,
+                                                ));
+                                    }),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                )
+              : const SizedBox.shrink(),
           Tooltip(
             message: '点击选择站点',
             child: GFIconButton(
+              icon: const Icon(
+                Icons.settings_input_composite_sharp,
+                color: Colors.white,
+                size: 15,
+              ),
+              type: GFButtonType.transparent,
               onPressed: () {
                 Get.bottomSheet(
                   Column(
@@ -100,7 +196,6 @@ class SearchView extends GetView<SearchPageController> {
                             size: GFSize.MEDIUM,
                             type: GFButtonType.transparent,
                             onPressed: () {
-                              controller.siteList.clear();
                               controller.update();
                               Get.back();
                             },
@@ -135,51 +230,64 @@ class SearchView extends GetView<SearchPageController> {
                                         MySite mySite = mySiteList[index];
                                         WebSite? webSite =
                                             controller.webSiteList[mySite.site];
-                                        return GFCheckboxListTile(
-                                          margin: const EdgeInsets.all(0),
-                                          title: Text(
-                                            mySite.nickname,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white70,
-                                            ),
-                                          ),
-                                          subTitle: Text(
-                                            '${webSite!.name} - ${webSite.nickname}',
-                                            style: const TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.white70,
-                                            ),
-                                          ),
-                                          avatar: GFAvatar(
-                                            shape: GFAvatarShape.standard,
-                                            backgroundImage:
-                                                NetworkImage(webSite.logo),
-                                            size: 18,
-                                          ),
-                                          size: 18,
-                                          activeBgColor: Colors.green,
-                                          type: GFCheckboxType.circle,
-                                          activeIcon: const Icon(
-                                            Icons.check,
-                                            size: 12,
-                                            color: Colors.white,
-                                          ),
-                                          onChanged: (value) {
-                                            print(value);
-                                            if (value) {
-                                              controller.siteList
-                                                  .add(mySite.id);
-                                            } else {
-                                              controller.siteList
-                                                  .remove(mySite.id);
-                                            }
-                                            controller.update();
-                                            print(controller.siteList.length);
+                                        bool isChecked = controller.siteList
+                                            .contains(mySite.id);
+                                        return StatefulBuilder(
+                                          builder: (context, setInnerState) {
+                                            return GFCheckboxListTile(
+                                              margin: const EdgeInsets.all(0),
+                                              type: GFCheckboxType.square,
+                                              title: Text(
+                                                mySite.nickname,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.white70,
+                                                ),
+                                              ),
+                                              subTitle: Text(
+                                                '${webSite!.name} - ${webSite.nickname}',
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.white70,
+                                                ),
+                                              ),
+                                              avatar: GFAvatar(
+                                                shape: GFAvatarShape.square,
+                                                backgroundImage:
+                                                    NetworkImage(webSite.logo),
+                                                size: 18,
+                                              ),
+                                              size: 18,
+                                              activeBgColor: Colors.green,
+                                              activeIcon: const Icon(
+                                                Icons.check,
+                                                size: 12,
+                                                color: Colors.white,
+                                              ),
+                                              onChanged: (value) {
+                                                print(value);
+                                                if (value) {
+                                                  controller.siteList
+                                                      .add(mySite.id);
+                                                } else {
+                                                  controller.siteList
+                                                      .remove(mySite.id);
+                                                }
+                                                setInnerState(() => isChecked =
+                                                    controller.siteList
+                                                        .contains(mySite.id));
+                                                controller.update();
+                                                print(
+                                                    controller.siteList.length);
+                                              },
+                                              value: isChecked,
+                                              inactiveIcon: const Icon(
+                                                Icons.check_box_outline_blank,
+                                                size: 12,
+                                                color: Colors.white,
+                                              ),
+                                            );
                                           },
-                                          value: controller.siteList
-                                              .contains(mySite.id),
-                                          // inactiveIcon: null,
                                         );
                                       });
                               }
@@ -190,12 +298,6 @@ class SearchView extends GetView<SearchPageController> {
                   backgroundColor: Colors.teal,
                 );
               },
-              icon: const Icon(
-                Icons.settings_input_composite_sharp,
-                color: Colors.white,
-                size: 15,
-              ),
-              type: GFButtonType.transparent,
             ),
           ),
         ],
@@ -231,6 +333,31 @@ class SearchView extends GetView<SearchPageController> {
             //   },
             //   onItemSelected: (item) {},
             // ),
+
+            controller.searchList.isNotEmpty
+                ? Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        const Icon(
+                          Icons.info_outline,
+                          color: GFColors.WARNING,
+                          size: 15,
+                        ),
+                        controller.searchList.isNotEmpty
+                            ? Text(
+                                '共搜索到种子：${controller.searchList.length}个...',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                              )
+                            : GFLoader()
+                      ],
+                    ),
+                  )
+                : const SizedBox.shrink(),
             StreamBuilder(
                 stream: controller.streamController.stream,
                 initialData: false,
@@ -239,42 +366,25 @@ class SearchView extends GetView<SearchPageController> {
                   Logger.instance.w(snapshot.data);
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
-                      return const Center(
-                        child: Text(
-                          '嗖嗖嗖...',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                      );
-
+                      return const SizedBox.shrink();
                     case ConnectionState.waiting:
-                      return const Center(
-                        child: Text(
-                          '正在搜索...',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                      );
+                      return const SizedBox.shrink();
                     case ConnectionState.active:
                       Map response = json.decode(snapshot.data.toString());
                       if (response['code'] != 0) {
-                        print(response['msg']);
-                        controller.errList.add(response['msg']);
+                        controller.errList.add({
+                          "code": response['code'],
+                          "msg": response['msg'],
+                        });
                       } else {
-                        print(response['msg']);
-                        // {
-                        //   "site": site.id,
-                        //   "torrents": torrents
-                        // }
                         controller.searchList.addAll(
                             (response['data']['torrents'] as List)
                                 .map((item) => SearchResult.fromJson(item))
                                 .toList());
-                        controller.errList.add(response['msg']);
+                        controller.errList.add({
+                          "code": response['code'],
+                          "msg": response['msg'],
+                        });
                       }
                       return snapshot.hasData
                           ? Expanded(
@@ -285,18 +395,10 @@ class SearchView extends GetView<SearchPageController> {
                                     return _buildSearchItem(context, item!);
                                   }),
                             )
-                          : const Center(
-                              child: Text(
-                                '正在搜索...',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            );
+                          : const GFLoader();
                     case ConnectionState.done:
                       controller.streamController.close();
-                      return Container();
+                      return const SizedBox.shrink();
                   }
                 }),
           ],
@@ -321,14 +423,14 @@ class SearchView extends GetView<SearchPageController> {
       // ),
       showImage: result.poster!.isNotEmpty,
       // showOverlayImage: false,
-      margin: const EdgeInsets.all(5),
+      margin: const EdgeInsets.only(left: 8, right: 8, top: 10),
       padding: const EdgeInsets.all(0),
       boxFit: BoxFit.cover,
       color: Colors.transparent,
       title: GFListTile(
           padding: const EdgeInsets.all(0),
           onTap: () async {
-            Uri uri = Uri.parse(result.magnetUrl!);
+            Uri uri = Uri.parse('${webSite.url}details.php?id=${result.tid!}');
             if (!await launchUrl(uri)) {
               Get.snackbar('打开网页出错', '打开网页出错，不支持的客户端？');
             }
@@ -348,14 +450,35 @@ class SearchView extends GetView<SearchPageController> {
             },
           ),
           avatar: GFAvatar(
-            backgroundColor: Colors.teal.shade900,
+            backgroundColor: Colors.teal.shade800,
             shape: GFAvatarShape.standard,
-            backgroundImage: AssetImage(webSite!.logo),
-            child: Text(webSite.name.toString(),
-                style: const TextStyle(
-                    fontSize: 11,
-                    color: Colors.white70,
-                    overflow: TextOverflow.ellipsis)),
+            backgroundImage: NetworkImage(webSite!.logo),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Expanded(
+                    child: SizedBox(),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Card(
+                      color: Colors.teal,
+                      margin: null,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
+                          child: Text(webSite.name.toString(),
+                              style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  overflow: TextOverflow.ellipsis)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ]),
           ),
           title: EllipsisText(
             text: result.title!,
