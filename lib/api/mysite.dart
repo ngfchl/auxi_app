@@ -1,4 +1,7 @@
+import 'package:auxi_app/app/home/models/website.dart';
+
 import '../../utils/http.dart';
+import '../app/home/models/mysite.dart';
 import '../app/home/models/site_status.dart';
 import '../models/common_response.dart';
 import 'api.dart';
@@ -19,9 +22,46 @@ Future<CommonResponse> getSiteStatusList() async {
   }
 }
 
+/// 获取
+Future<CommonResponse> getMySiteList() async {
+  final response = await DioClient().get(Api.MYSITE_LIST);
+  if (response.statusCode == 200) {
+    final dataList = (response.data['data'] as List)
+        .map<MySite>((item) => MySite.fromJson(item))
+        .toList();
+    String msg = '拥有${dataList.length}个站点';
+    print(msg);
+    return CommonResponse(data: dataList, code: 0, msg: msg);
+  } else {
+    String msg = '获取主页状态失败: ${response.statusCode}';
+    // GFToast.showToast(msg, context);
+    return CommonResponse(data: null, code: -1, msg: msg);
+  }
+}
+
 /// 获取站点信息列表
 ///
-getWebSiteList() async {}
+Future<CommonResponse> getWebSiteList() async {
+  final response = await DioClient().get(Api.WEBSITE_LIST);
+  if (response.statusCode == 200) {
+    Map<int, WebSite> dataList = (response.data['data'] as List)
+        .map<WebSite>((item) => WebSite.fromJson(item))
+        .toList()
+        .asMap()
+        .entries
+        .fold({}, (result, entry) {
+      result[entry.value.id] = entry.value;
+      return result;
+    });
+    String msg = '工具共支持${dataList.length}个站点';
+    print(msg);
+    return CommonResponse(data: dataList, code: 0, msg: msg);
+  } else {
+    String msg = '获取主页状态失败: ${response.statusCode}';
+    // GFToast.showToast(msg, context);
+    return CommonResponse(data: null, code: -1, msg: msg);
+  }
+}
 
 /// 签到当前站点
 signIn(int mySiteId) async {}
