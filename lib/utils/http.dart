@@ -1,6 +1,7 @@
 import 'package:auxi_app/utils/storage.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
+import 'package:get/route_manager.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../models/authinfo.dart';
@@ -23,7 +24,12 @@ class DioClient {
   final box = GetStorage();
 
   void _init() {
-    String baseUrl = '${SPUtil.getString("server") ?? ''}/api/';
+    var server = SPUtil.getString("server") ?? '';
+    if (server.isEmpty) {
+      Get.snackbar('出错啦！', '请先设置并选择服务器地址！');
+      return;
+    }
+    String baseUrl = '$server/api/';
     Logger.instance.i(baseUrl);
     BaseOptions options = BaseOptions(
       //请求基地址,可以包含子路径
@@ -49,7 +55,8 @@ class DioClient {
     ));
   }
 
-  Future<Response> get(String url, {
+  Future<Response> get(
+    String url, {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
@@ -60,7 +67,8 @@ class DioClient {
     return response;
   }
 
-  Future<Response> post(String url, {
+  Future<Response> post(
+    String url, {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? formData,
     Options? options,
@@ -76,7 +84,8 @@ class DioClient {
     return resp;
   }
 
-  Future<Response> put(String url, {
+  Future<Response> put(
+    String url, {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? formData,
     Options? options,
@@ -89,7 +98,8 @@ class DioClient {
     );
   }
 
-  Future<Response> delete(String url, {
+  Future<Response> delete(
+    String url, {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? formData,
     Options? options,
