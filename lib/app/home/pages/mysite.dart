@@ -30,6 +30,11 @@ class _MySitePageState extends State<MySitePage>
 
   @override
   void initState() {
+    getSiteStatusFromServer();
+    super.initState();
+  }
+
+  void getSiteStatusFromServer() {
     getSiteStatusList().then((value) {
       if (value.code == 0) {
         setState(() {
@@ -44,8 +49,6 @@ class _MySitePageState extends State<MySitePage>
         );
       }
     }).catchError((e) => GFToast.showToast(e.toString(), context));
-
-    super.initState();
   }
 
   @override
@@ -57,7 +60,7 @@ class _MySitePageState extends State<MySitePage>
         child: isLoaded
             ? EasyRefresh(
                 onRefresh: () async {
-                  await getSiteStatusList();
+                  getSiteStatusFromServer();
                 },
                 child: ListView.builder(
                     itemCount: statusList.length,
