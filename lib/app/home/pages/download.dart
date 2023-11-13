@@ -51,9 +51,9 @@ class _DownloadPageState
 
   Widget buildDownloaderCard(Downloader downloader) {
     bool connectState = true;
-    getDownloaderConnectTest(downloader.id).then((res) {
-      connectState = res.code == 0;
-    });
+    // getDownloaderConnectTest(downloader.id).then((res) {
+    //   connectState = res.code == 0;
+    // });
     return GFCard(
       padding: const EdgeInsets.only(left: 0, right: 0, bottom: 15),
       boxFit: BoxFit.cover,
@@ -64,13 +64,21 @@ class _DownloadPageState
           // shape: GFAvatarShape.square,
           backgroundImage: AssetImage(
               'assets/images/${downloader.category.toLowerCase()}.png'),
+          size: 18,
         ),
         title: Text(
           downloader.name,
           style: const TextStyle(
             color: Colors.white70,
             fontWeight: FontWeight.bold,
-            fontSize: 22,
+            fontSize: 14,
+          ),
+        ),
+        subTitle: Text(
+          '${downloader.http}://${downloader.host}:${downloader.port}',
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 11,
           ),
         ),
         icon: GFIconButton(
@@ -104,12 +112,6 @@ class _DownloadPageState
               );
             });
           },
-        ),
-        subTitle: Text(
-          '${downloader.http}://${downloader.host}:${downloader.port}',
-          style: const TextStyle(
-            color: Colors.white70,
-          ),
         ),
       ),
       content: getSpeedInfo(downloader),
@@ -155,8 +157,10 @@ class _DownloadPageState
                   // controller.getDownloaderListFromServer();
                   getDownloaderList().then((value) {
                     if (value.code == 0) {
-                      dataList = value.data;
-                      isLoaded = true;
+                      setState(() {
+                        dataList = value.data;
+                        isLoaded = true;
+                      });
                     } else {
                       Get.snackbar('', value.msg.toString());
                     }
@@ -173,7 +177,10 @@ class _DownloadPageState
                     }),
               )
             : const GFLoader(
-                type: GFLoaderType.circle,
+                type: GFLoaderType.custom,
+                loaderIconOne: Icon(Icons.insert_emoticon),
+                loaderIconTwo: Icon(Icons.insert_emoticon),
+                loaderIconThree: Icon(Icons.insert_emoticon),
               ),
       ),
       floatingActionButton: GFIconButton(
@@ -201,22 +208,23 @@ class _DownloadPageState
           if (snapshot.connectionState == ConnectionState.done) {
             LoggerHelper.Logger.instance.w(snapshot.data);
             if (snapshot.data == null) {
-              return const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.electrical_services,
-                    color: Colors.white70,
-                  ),
-                  Text(
-                    '正在连接...',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w300,
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
+              return const GFLoader(
+                type: GFLoaderType.custom,
+                loaderIconOne: Icon(
+                  Icons.insert_emoticon,
+                  color: Colors.orange,
+                  size: 12,
+                ),
+                loaderIconTwo: Icon(
+                  Icons.insert_emoticon,
+                  color: Colors.red,
+                  size: 14,
+                ),
+                loaderIconThree: Icon(
+                  Icons.insert_emoticon,
+                  color: Colors.purple,
+                  size: 12,
+                ),
               );
             }
             var res = snapshot.data.data;
@@ -294,10 +302,11 @@ class _DownloadPageState
                 themeData: BrnEnhanceNumberCardConfig(
                   descTextStyle: BrnTextStyle(
                     color: Colors.white70,
+                    fontSize: 11,
                   ),
                   titleTextStyle: BrnTextStyle(
                     color: Colors.white70,
-                    fontSize: 22,
+                    fontSize: 15,
                   ),
                 ));
           }
