@@ -2,6 +2,7 @@ import 'package:bruno/bruno.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ellipsis_text/flutter_ellipsis_text.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 
@@ -49,6 +50,10 @@ class _DownloadPageState
   }
 
   Widget buildDownloaderCard(Downloader downloader) {
+    bool connectState = true;
+    getDownloaderConnectTest(downloader.id).then((res) {
+      connectState = res.code == 0;
+    });
     return GFCard(
       padding: const EdgeInsets.only(left: 0, right: 0, bottom: 15),
       boxFit: BoxFit.cover,
@@ -67,6 +72,38 @@ class _DownloadPageState
             fontWeight: FontWeight.bold,
             fontSize: 22,
           ),
+        ),
+        icon: GFIconButton(
+          icon: connectState
+              ? const Icon(
+                  Icons.flash_on,
+                  color: Colors.white70,
+                  size: 24,
+                )
+              : const Icon(
+                  Icons.flash_off,
+                  color: Colors.red,
+                  size: 24,
+                ),
+          type: GFButtonType.transparent,
+          onPressed: () {
+            getDownloaderConnectTest(downloader.id).then((res) {
+              Get.snackbar(
+                '下载器连接测试',
+                '',
+                messageText: EllipsisText(
+                  text: res.msg!,
+                  ellipsis: '...',
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: res.code == 0 ? Colors.white : Colors.red,
+                  ),
+                ),
+                colorText: res.code == 0 ? Colors.white : Colors.red,
+              );
+            });
+          },
         ),
         subTitle: Text(
           '${downloader.http}://${downloader.host}:${downloader.port}',
