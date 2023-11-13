@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:auxi_app/api/downloader.dart';
 import 'package:auxi_app/app/home/models/mysite.dart';
 import 'package:auxi_app/app/home/models/website.dart';
 import 'package:auxi_app/app/search/search_controller.dart';
 import 'package:auxi_app/common/glass_widget.dart';
+import 'package:auxi_app/models/common_response.dart';
 import 'package:auxi_app/models/search_result.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,8 @@ import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../utils/logger_helper.dart';
+import '../../models/download.dart';
+import '../../utils/logger_helper.dart' as LoggerHelper;
 
 class SearchView extends GetView<SearchPageController> {
   const SearchView({Key? key}) : super(key: key);
@@ -219,7 +222,7 @@ class SearchView extends GetView<SearchPageController> {
                                 case ConnectionState.active:
                                   return Text('active');
                                 case ConnectionState.done:
-                                  Logger.instance.w(snapshot.data);
+                                  LoggerHelper.Logger.instance.w(snapshot.data);
                                   if (snapshot.data.code != 0) {
                                     return Text('Error');
                                   }
@@ -362,8 +365,8 @@ class SearchView extends GetView<SearchPageController> {
                 stream: controller.streamController.stream,
                 initialData: false,
                 builder: (context, snapshot) {
-                  Logger.instance.w(snapshot.connectionState);
-                  Logger.instance.w(snapshot.data);
+                  LoggerHelper.Logger.instance.w(snapshot.connectionState);
+                  LoggerHelper.Logger.instance.w(snapshot.data);
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
                       return const SizedBox.shrink();
@@ -668,7 +671,7 @@ class SearchView extends GetView<SearchPageController> {
                 ],
               ),
             ),
-          if (result.hr!)
+          if (!result.hr!)
             const Padding(
               padding: EdgeInsets.all(5.0),
               child: Row(
@@ -733,41 +736,210 @@ class SearchView extends GetView<SearchPageController> {
                       ],
                     ),
                     Expanded(
-                      child: ListView(
-                        children: [
-                          GFListTile(
-                            title: const Text(
-                              'Dell8999',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white70,
-                              ),
-                            ),
-                            subTitle: const Text(
-                              'http://192.168.123.5:8999',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.white70,
-                              ),
-                            ),
-                            avatar: const GFAvatar(
-                              shape: GFAvatarShape.circle,
-                              backgroundImage:
-                                  AssetImage('assets/images/qb.png'),
-                              size: 16,
-                            ),
-                            icon: const Icon(
-                              Icons.arrow_forward_ios,
-                              size: 18,
-                              color: Colors.white70,
-                            ),
-                            onTap: () {
-                              Get.snackbar('', '展开下载器分类');
-                            },
-                          ),
-                        ],
+                      child: FutureBuilder(
+                        future: getDownloaderList(),
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            List downloaderList = snapshot.data.data;
+                            return ListView.builder(
+                              itemCount: downloaderList.length,
+                              itemBuilder: (context, index) {
+                                Downloader downloader = downloaderList[index];
+                                return GFListTile(
+                                  title: Text(
+                                    downloader.name,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                  subTitle: Text(
+                                    '${downloader.http}://${downloader.host}:${downloader.port}',
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                  avatar: GFAvatar(
+                                    shape: GFAvatarShape.circle,
+                                    backgroundImage: AssetImage(
+                                        'assets/images/${downloader.category.toLowerCase()}.png'),
+                                    size: 16,
+                                  ),
+                                  icon: const Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 18,
+                                    color: Colors.white70,
+                                  ),
+                                  onTap: () async {
+                                    getDownloaderConnectTest(downloader.id)
+                                        .then((res) {
+                                      if (res.code != 0) {
+                                        Get.snackbar(
+                                          '下载器连接测试',
+                                          '',
+                                          messageText: EllipsisText(
+                                            text: res.msg!,
+                                            ellipsis: '...',
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                    });
+                                    Get.defaultDialog(
+                                      title: '推送到下载器',
+                                      titleStyle: const TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.white70,
+                                      ),
+                                      backgroundColor: Colors.teal,
+                                      content: FutureBuilder(
+                                        future: getDownloaderCategories(
+                                            downloader.id),
+                                        builder: (BuildContext context,
+                                            AsyncSnapshot snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.done) {
+                                            List<DownloaderCategory>
+                                                categories = snapshot.data.data;
+                                            LoggerHelper.Logger.instance
+                                                .w(categories);
+                                            // if (downloader.category
+                                            //         .toLowerCase() ==
+                                            //     'qb') {
+                                            //   categories.insert(
+                                            //       0,
+                                            //       DownloaderCategory(
+                                            //           name: '',
+                                            //           savePath: '未分类'));
+                                            // }
+                                            return SizedBox(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.9,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.25,
+                                              child: ListView.builder(
+                                                  itemCount: categories.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    DownloaderCategory
+                                                        category =
+                                                        categories[index];
+                                                    return GFListTile(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              0),
+                                                      title: Text(
+                                                        category.name!,
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          color: Colors.white70,
+                                                        ),
+                                                      ),
+                                                      subTitle: Text(
+                                                        category.savePath!,
+                                                        style: const TextStyle(
+                                                          fontSize: 10,
+                                                          color: Colors.white70,
+                                                        ),
+                                                      ),
+                                                      onTap: () {
+                                                        Get.defaultDialog(
+                                                          title: '推送种子',
+                                                          backgroundColor:
+                                                              Colors.teal,
+                                                          content: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              EllipsisText(
+                                                                text:
+                                                                    '${result.title!} ',
+                                                                maxLines: 2,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                      .white70,
+                                                                ),
+                                                                ellipsis: '...',
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 10,
+                                                              ),
+                                                              Text(
+                                                                '下载器：${downloader.name}',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                      .white70,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                '到分类：${category.name}？',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                      .white70,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          textConfirm: '推送',
+                                                          textCancel: '取消',
+                                                          onConfirm: () async {
+                                                            CommonResponse res =
+                                                                await pushTorrentToDownloader(
+                                                              site: result
+                                                                  .siteId!,
+                                                              downloaderId:
+                                                                  downloader.id,
+                                                              url: result
+                                                                  .magnetUrl!,
+                                                              category: category
+                                                                  .name!,
+                                                            );
+                                                            LoggerHelper
+                                                                .Logger.instance
+                                                                .w(res);
+                                                            Get.back();
+                                                          },
+                                                          onCancel: () {
+                                                            Get.back();
+                                                          },
+                                                        );
+                                                      },
+                                                    );
+                                                  }),
+                                            );
+                                          }
+                                          return const GFLoader();
+                                        },
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          }
+                          return const GFLoader();
+                        },
                       ),
-                    ),
+                    )
                   ],
                 ),
                 backgroundColor: Colors.teal,
