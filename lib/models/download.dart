@@ -81,3 +81,22 @@ class Downloader {
     };
   }
 }
+
+class DownloaderCategory {
+  String? name;
+  String? savePath;
+
+  DownloaderCategory({this.name, this.savePath});
+
+  DownloaderCategory.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    savePath = json['savePath'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['savePath'] = savePath;
+    return data;
+  }
+}
