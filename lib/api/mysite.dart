@@ -24,7 +24,7 @@ Future<CommonResponse> getSiteStatusList() async {
 
 /// 获取
 Future<CommonResponse> getMySiteList() async {
-  final response = await DioClient().get(Api.MYSITE_LIST);
+  final response = await DioClient().get(Api.MYSITE_OPERATE_URL);
   if (response.statusCode == 200) {
     final dataList = (response.data['data'] as List)
         .map<MySite>((item) => MySite.fromJson(item))
