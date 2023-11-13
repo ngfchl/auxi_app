@@ -26,8 +26,10 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
   ));
-  WidgetsFlutterBinding.ensureInitialized();
-  await initializeService();
+  if (Platform.isAndroid || Platform.isIOS) {
+    WidgetsFlutterBinding.ensureInitialized();
+    await initializeService();
+  }
   runApp(
     GetMaterialApp(
         title: "PTOOLS",
