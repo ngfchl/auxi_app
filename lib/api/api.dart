@@ -17,6 +17,15 @@ class Api {
   // 下载器速度列表
   static const String DOWNLOADER_SPEED_URL = "download/downloaders/speed";
 
+  // 下载器分类列表
+  static const String DOWNLOADER_CATEGORIES = "download/downloaders/categories";
+
+  //下载器链接测试
+  static const String DOWNLOADER_CONNECT_TEST = "download/downloader/test";
+
+  // 推送种子到下载器
+  static const String PUSH_TORRENT_URL = "/mysite/push_torrent";
+
 // export const $taskExecute: (task_id: number) => Promise<any> = async (task_id: number) => {
 // return await getList<object, Task>('schedule/exec', { task_id })
 // }
