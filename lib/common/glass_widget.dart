@@ -15,7 +15,7 @@ class GlassWidget extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         Lottie.asset(
-          StringUtils.getLottieByName('五彩纸屑'),
+          StringUtils.getLottieByName('8isjhu0WtD'),
           repeat: true,
           fit: BoxFit.cover,
         ),
