@@ -82,7 +82,21 @@ signIn(int mySiteId) async {
 }
 
 /// 更新当前站点数据
-getNewestStatus(int mySiteId) async {}
+getNewestStatus(int mySiteId) async {
+  final response = await DioClient().post(
+    Api.MYSITE_STATUS_OPERATE,
+    formData: {
+      "site_id": mySiteId,
+    },
+  );
+  if (response.statusCode == 200) {
+    Logger.instance.w(response.data);
+    return CommonResponse.fromJson(response.data, (p0) => null);
+  } else {
+    String msg = '站点刷新数据失败！: ${response.statusCode}';
+    return CommonResponse(data: null, code: -1, msg: msg);
+  }
+}
 
 /// 获取站点历史数据
 getChartData(int mySiteId) async {}

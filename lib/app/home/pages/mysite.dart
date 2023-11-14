@@ -328,6 +328,7 @@ class _MySitePageState extends State<MySitePage>
         ),
     ];
     return GFCard(
+      margin: const EdgeInsets.all(5),
       boxFit: BoxFit.cover,
       color: Colors.transparent,
       // image: Image.asset('your asset image'),
@@ -565,7 +566,26 @@ class _MySitePageState extends State<MySitePage>
             width: 68,
             height: 26,
             child: GFButton(
-              onPressed: () {},
+              onPressed: () {
+                getNewestStatus(siteStatus.mySiteId!).then((res) {
+                  Get.back();
+                  if (res.code == 0) {
+                    Get.snackbar(
+                      '站点数据刷新成功',
+                      '${siteStatus.mySiteNickname} 数据刷新：${res.msg}',
+                      colorText: Colors.white70,
+                      backgroundColor: Colors.teal.withOpacity(0.7),
+                    );
+                  } else {
+                    Get.snackbar(
+                      '站点数据刷新失败',
+                      '${siteStatus.mySiteNickname!} 数据刷新出错啦：${res.msg}',
+                      colorText: Colors.red,
+                      backgroundColor: Colors.teal.withOpacity(0.7),
+                    );
+                  }
+                });
+              },
               icon: const Icon(
                 Icons.update,
                 size: 12,
