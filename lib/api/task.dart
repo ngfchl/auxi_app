@@ -81,3 +81,31 @@ Future<CommonResponse> getCrontabList() async {
     return CommonResponse(data: null, code: -1, msg: msg);
   }
 }
+
+Future<CommonResponse> execRemoteTask(int taskId) async {
+  final response = await DioClient()
+      .get(Api.TASK_EXEC_URL, queryParameters: {"task_id": taskId});
+  if (response.statusCode == 200) {
+    Logger.instance.w(response.data);
+    return CommonResponse.fromJson(response.data, (p0) => null);
+  } else {
+    String msg = '计划任务手动执行失败: ${response.statusCode}';
+    // GFToast.showToast(msg, context);
+    return CommonResponse(data: null, code: -1, msg: msg);
+  }
+}
+
+Future<CommonResponse> editRemoteTask(Schedule schedule) async {
+  Map<String, dynamic> data = schedule.toJson();
+  Logger.instance.w(data);
+  Logger.instance.w(data);
+  final response = await DioClient().put(Api.TASK_OPERATE_URL, formData: data);
+  if (response.statusCode == 200) {
+    Logger.instance.w(response.data);
+    return CommonResponse.fromJson(response.data, (p0) => null);
+  } else {
+    String msg = '计划任务修改失败: ${response.statusCode}';
+    // GFToast.showToast(msg, context);
+    return CommonResponse(data: null, code: -1, msg: msg);
+  }
+}

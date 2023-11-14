@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:transfer_list/transfer_list.dart';
 
+import '../../../api/task.dart';
 import '../models/task.dart';
 import 'controller/task_controller.dart';
 
@@ -280,6 +281,40 @@ class TaskPage extends StatelessWidget {
                 onLongPress: () {
                   Get.snackbar('title', '删除任务？');
                 },
+                onTap: () {
+                  Get.defaultDialog(
+                    title: '运行任务',
+                    middleText: '确定要运行？',
+                    textCancel: '取消',
+                    textConfirm: '确定',
+                    backgroundColor: Colors.teal.withOpacity(0.7),
+                    titleStyle: const TextStyle(color: Colors.white),
+                    middleTextStyle: const TextStyle(color: Colors.white),
+                    onCancel: () {
+                      Get.back();
+                    },
+                    onConfirm: () {
+                      execRemoteTask(item.id!).then((res) {
+                        Get.back();
+                        if (res.code == 0) {
+                          Get.snackbar(
+                            '执行任务',
+                            '${item.name!} 任务ID：${res.msg}',
+                            colorText: Colors.white70,
+                            backgroundColor: Colors.teal.withOpacity(0.7),
+                          );
+                        } else {
+                          Get.snackbar(
+                            '执行任务',
+                            '${item.name!} 任务执行出错啦：${res.msg}',
+                            colorText: Colors.red,
+                            backgroundColor: Colors.teal.withOpacity(0.7),
+                          );
+                        }
+                      });
+                    },
+                  );
+                },
                 padding: const EdgeInsets.all(0),
                 title: Text(
                   item.name!,
@@ -306,70 +341,62 @@ class TaskPage extends StatelessWidget {
               ),
               buttonBar: GFButtonBar(
                 children: <Widget>[
-                  item.enabled!
-                      ? GFButton(
-                          onPressed: () {
-                            Get.defaultDialog(
-                              title: '关闭任务',
-                              middleText: '确定要关闭？',
-                              onCancel: () {
-                                Get.back();
-                              },
-                              onConfirm: () {
-                                Get.snackbar('关闭', '关闭任务？');
-                              },
-                              textCancel: '取消',
-                              textConfirm: '确定',
-                            );
+                  SizedBox(
+                    width: 58,
+                    height: 26,
+                    child: GFButton(
+                      onPressed: () {
+                        Get.defaultDialog(
+                          title: item.enabled! ? '关闭任务' : '开启任务',
+                          middleText: item.enabled! ? '确定要？' : '确定要开启？',
+                          onCancel: () {
+                            Get.back();
                           },
-                          color: GFColors.DANGER,
-                          text: '关闭',
-                          size: GFSize.SMALL,
-                        )
-                      : GFButton(
-                          onPressed: () {
-                            Get.defaultDialog(
-                              title: '开启任务',
-                              middleText: '确定要开启？',
-                              onCancel: () {
-                                Get.back();
-                              },
-                              onConfirm: () {
-                                Get.snackbar('开启', '开启任务？');
-                              },
-                              textCancel: '取消',
-                              textConfirm: '确定',
-                            );
+                          onConfirm: () {
+                            item.enabled!
+                                ? item.enabled = false
+                                : item.enabled = true;
+                            editRemoteTask(item).then((res) {
+                              Get.back();
+                              if (res.code == 0) {
+                                controller.getTaskInfo();
+                                Get.snackbar(
+                                  item.enabled! ? '关闭任务' : '开启任务',
+                                  '${res.msg}',
+                                  colorText: Colors.white70,
+                                  backgroundColor: Colors.teal.withOpacity(0.7),
+                                );
+                              } else {
+                                Get.snackbar(
+                                  item.enabled! ? '关闭任务' : '开启任务',
+                                  '${res.msg}',
+                                  colorText: Colors.red,
+                                  backgroundColor: Colors.teal.withOpacity(0.7),
+                                );
+                              }
+                            });
                           },
-                          color: GFColors.SUCCESS,
-                          text: '开启',
-                          size: GFSize.SMALL,
-                        ),
-                  GFButton(
-                    onPressed: () {
-                      Get.defaultDialog(
-                        title: '运行任务',
-                        middleText: '确定要运行？',
-                        onCancel: () {
-                          Get.back();
-                        },
-                        onConfirm: () {
-                          Get.snackbar('运行任务', '运行任务？');
-                        },
-                        textCancel: '取消',
-                        textConfirm: '确定',
-                      );
-                    },
-                    text: '运行',
-                    size: GFSize.SMALL,
-                    color: GFColors.SECONDARY,
+                          textCancel: '取消',
+                          textConfirm: '确定',
+                        );
+                      },
+                      color:
+                          item.enabled! ? GFColors.WARNING : GFColors.SUCCESS,
+                      text: item.enabled! ? '禁用' : '启用',
+                      size: GFSize.SMALL,
+                    ),
                   ),
-                  GFButton(
-                    onPressed: () {
-                      editTask(item);
-                    },
-                    text: '编辑',
-                    size: GFSize.SMALL,
+                  SizedBox(
+                    width: 58,
+                    height: 26,
+                    child: GFButton(
+                      onPressed: () {
+                        editTask(item);
+                      },
+                      text: '编辑',
+                      size: GFSize.SMALL,
+                      color: GFColors.SECONDARY,
+                    ),
                   ),
                 ],
               ),
