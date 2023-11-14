@@ -93,7 +93,7 @@ class DioClient {
     return await dio.put(
       url,
       queryParameters: queryParameters,
-      data: formData != null ? FormData.fromMap(formData) : null,
+      data: formData,
       options: options ?? await _buildRequestOptions(),
     );
   }
