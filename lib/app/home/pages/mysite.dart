@@ -3,6 +3,7 @@ import 'package:bruno/bruno.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:proper_filesize/proper_filesize.dart';
 
@@ -328,17 +329,15 @@ class _MySitePageState extends State<MySitePage>
     ];
     return GFCard(
       boxFit: BoxFit.cover,
-      color: Colors.teal[300],
+      color: Colors.transparent,
       // image: Image.asset('your asset image'),
       title: GFListTile(
         padding: const EdgeInsets.all(0.0),
         avatar: GFAvatar(
           backgroundImage:
-              NetworkImage(siteStatus.siteLogo as String, headers: {
-            //todo
-          }),
+              NetworkImage(siteStatus.siteLogo as String, headers: {}),
           shape: GFAvatarShape.standard,
-          size: GFSize.LARGE,
+          size: GFSize.SMALL,
         ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -346,36 +345,38 @@ class _MySitePageState extends State<MySitePage>
             Text(
               '${siteStatus.mySiteNickname ?? siteStatus.siteName}',
               style: const TextStyle(
-                color: Colors.tealAccent,
-                fontSize: 18,
+                color: Colors.white70,
+                fontSize: 14,
               ),
             ),
-            if (siteStatus.statusMail != null && siteStatus.statusMail! > 0)
-              GFIconBadge(
-                counterChild: GFBadge(
-                  shape: GFBadgeShape.circle,
-                  size: 22,
-                  child: Text("${siteStatus.statusMail}"),
-                ),
-                position: GFBadgePosition.topStart(top: 8, start: 24),
-                child: GFIconButton(
-                  onPressed: () {
-                    GFToast.showToast('打开邮件链接！', context);
-                  },
-                  icon: const Icon(
-                    Icons.mail_outline,
-                    color: Colors.tealAccent,
-                    size: 16,
-                  ),
-                  type: GFButtonType.transparent,
-                  color: Colors.transparent,
+            // if (siteStatus.statusMail != null && siteStatus.statusMail! > 0)
+          ],
+        ),
+        icon: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            GFIconBadge(
+              counterChild: GFBadge(
+                shape: GFBadgeShape.square,
+                size: 18,
+                child: Text("${siteStatus.statusMail}"),
+              ),
+              position: GFBadgePosition.topEnd(top: 5, end: 0),
+              child: GFIconButton(
+                onPressed: () {
+                  GFToast.showToast('打开邮件链接！', context);
+                },
+                size: GFSize.SMALL,
+                type: GFButtonType.transparent,
+                icon: const Icon(
+                  Icons.mail_outline,
+                  color: Colors.white70,
                 ),
               ),
+            ),
             if (siteStatus.statusMyLevel != null)
               GFButton(
-                color: siteStatus.levelLevel == null
-                    ? Colors.teal.shade400
-                    : Colors.teal.shade500,
+                color: Colors.transparent,
                 // color: Colors.transparent,
                 text: '${siteStatus.statusMyLevel}',
                 // shape: GFButtonShape.pills,
@@ -493,8 +494,8 @@ class _MySitePageState extends State<MySitePage>
             padding: const EdgeInsets.all(0),
             backgroundColor: Colors.transparent,
             themeData: BrnEnhanceNumberCardConfig(
-              runningSpace: 0,
-              itemRunningSpace: 0,
+              runningSpace: -5,
+              itemRunningSpace: -5,
               titleTextStyle: BrnTextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -527,9 +528,29 @@ class _MySitePageState extends State<MySitePage>
       buttonBar: GFButtonBar(
         children: <Widget>[
           SizedBox(
-            width: 70,
+            width: 68,
+            height: 26,
             child: GFButton(
-              onPressed: () {},
+              onPressed: () {
+                signIn(siteStatus.mySiteId!).then((res) {
+                  Get.back();
+                  if (res.code == 0) {
+                    Get.snackbar(
+                      '签到成功',
+                      '${siteStatus.mySiteNickname} 签到信息：${res.msg}',
+                      colorText: Colors.white70,
+                      backgroundColor: Colors.teal.withOpacity(0.7),
+                    );
+                  } else {
+                    Get.snackbar(
+                      '签到失败',
+                      '${siteStatus.mySiteNickname!} 签到任务执行出错啦：${res.msg}',
+                      colorText: Colors.red,
+                      backgroundColor: Colors.teal.withOpacity(0.7),
+                    );
+                  }
+                });
+              },
               icon: const Icon(
                 Icons.pan_tool_alt,
                 size: 12,
@@ -541,7 +562,8 @@ class _MySitePageState extends State<MySitePage>
             ),
           ),
           SizedBox(
-            width: 70,
+            width: 68,
+            height: 26,
             child: GFButton(
               onPressed: () {},
               icon: const Icon(
@@ -555,7 +577,8 @@ class _MySitePageState extends State<MySitePage>
             ),
           ),
           SizedBox(
-            width: 70,
+            width: 68,
+            height: 26,
             child: GFButton(
               onPressed: () {},
               icon: const Icon(
@@ -569,7 +592,8 @@ class _MySitePageState extends State<MySitePage>
             ),
           ),
           SizedBox(
-            width: 70,
+            width: 68,
+            height: 26,
             child: GFButton(
               onPressed: () {},
               icon: const Icon(

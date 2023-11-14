@@ -4,6 +4,7 @@ import '../../utils/http.dart';
 import '../app/home/models/mysite.dart';
 import '../app/home/models/site_status.dart';
 import '../models/common_response.dart';
+import '../utils/logger_helper.dart';
 import 'api.dart';
 
 Future<CommonResponse> getSiteStatusList() async {
@@ -64,7 +65,21 @@ Future<CommonResponse> getWebSiteList() async {
 }
 
 /// 签到当前站点
-signIn(int mySiteId) async {}
+signIn(int mySiteId) async {
+  final response = await DioClient().post(
+    Api.MYSITE_SIGNIN_OPERATE,
+    formData: {
+      "site_id": mySiteId,
+    },
+  );
+  if (response.statusCode == 200) {
+    Logger.instance.w(response.data);
+    return CommonResponse.fromJson(response.data, (p0) => null);
+  } else {
+    String msg = '签到失败！: ${response.statusCode}';
+    return CommonResponse(data: null, code: -1, msg: msg);
+  }
+}
 
 /// 更新当前站点数据
 getNewestStatus(int mySiteId) async {}
