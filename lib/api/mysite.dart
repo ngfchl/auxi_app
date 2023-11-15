@@ -81,6 +81,33 @@ signIn(int mySiteId) async {
   }
 }
 
+signInAll() async {
+  final response = await DioClient().post(
+    Api.MYSITE_SIGNIN_DO_AUTO,
+  );
+  if (response.statusCode == 200) {
+    Logger.instance.w(response.data);
+    return CommonResponse.fromJson(response.data, (p0) => null);
+  } else {
+    String msg = '签到失败！: ${response.statusCode}';
+    return CommonResponse(data: null, code: -1, msg: msg);
+  }
+}
+
+/// 更新当前站点数据
+getNewestStatusAll() async {
+  final response = await DioClient().post(
+    Api.MYSITE_STATUS_ALL,
+  );
+  if (response.statusCode == 200) {
+    Logger.instance.w(response.data);
+    return CommonResponse.fromJson(response.data, (p0) => null);
+  } else {
+    String msg = '站点刷新数据失败！: ${response.statusCode}';
+    return CommonResponse(data: null, code: -1, msg: msg);
+  }
+}
+
 /// 更新当前站点数据
 getNewestStatus(int mySiteId) async {
   final response = await DioClient().post(

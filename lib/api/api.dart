@@ -12,10 +12,11 @@ class Api {
   static const String MYSITE_SINGLE_INFO = "mysite/mysite/get";
   static const String MYSITE_STATUS_OPERATE = "mysite/status";
   static const String MYSITE_STATUS_GET = "mysite/status/get";
+  static const String MYSITE_STATUS_ALL = "mysite/status/do";
   static const String MYSITE_TORRENTS_RSS = "mysite/torrents/rss";
   static const String MYSITE_TORRENTS_UPDATE = "mysite/torrents/update";
   static const String MYSITE_SIGNIN_OPERATE = "mysite/signin";
-  static const String MYSITE_SIGNIN_DO_AUTO = "mysite/signin/do";
+  static const String MYSITE_SIGNIN_DO_AUTO = "mysite/sign/do";
   static const String MYSITE_IMPORT = "mysite/import";
   static const String MYSITE_STATUS_CHART = "mysite/status/chart";
   static const String MYSITE_SORT = "mysite/sort";
