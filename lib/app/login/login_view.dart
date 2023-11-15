@@ -297,7 +297,7 @@ class LoginView extends GetView<LoginController> {
                                           ),
                                           inputFormatters: [
                                             FilteringTextInputFormatter.allow(
-                                                RegExp("[A-Z,a-z,0-9,/,:,.]"))
+                                                RegExp("[A-Z,a-z,0-9,/,:,.,-]"))
                                           ],
                                         ),
                                       ),
