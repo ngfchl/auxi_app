@@ -55,9 +55,10 @@ class _DownloadPageState
     //   connectState = res.code == 0;
     // });
     return GFCard(
+      margin: const EdgeInsets.all(5),
       padding: const EdgeInsets.only(left: 0, right: 0, bottom: 15),
       boxFit: BoxFit.cover,
-      color: Colors.transparent,
+      color: Colors.grey.withOpacity(0.5),
       title: GFListTile(
         padding: const EdgeInsets.all(0),
         avatar: GFAvatar(

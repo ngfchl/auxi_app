@@ -15,7 +15,21 @@ class HomeView extends GetView<HomeController> {
       key: _globalKey,
       backgroundColor: Colors.teal.shade200,
       appBar: GFAppBar(
-        backgroundColor: Colors.teal.withOpacity(0.3),
+        backgroundColor: Colors.teal.withOpacity(0.5),
+        elevation: 0.0,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                Colors.green.withOpacity(0.3),
+                Colors.teal.withOpacity(0.4),
+                Colors.blue.withOpacity(0.6),
+              ],
+            ),
+          ),
+        ),
         actions: <Widget>[
           GFIconButton(
             icon: const Icon(

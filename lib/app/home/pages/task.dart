@@ -257,7 +257,8 @@ class TaskPage extends StatelessWidget {
   List<Widget> _buildTaskList() {
     return controller.dataList
         .map((item) => GFCard(
-              color: Colors.teal.shade300.withOpacity(0.3),
+              color: Colors.grey.withOpacity(0.5),
+              margin: const EdgeInsets.all(5),
               padding:
                   const EdgeInsets.only(left: 0, right: 0, top: 8, bottom: 8),
               border: Border.all(

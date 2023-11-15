@@ -29,10 +29,13 @@ class _DashBoardState extends State<DashBoard>
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: GlassWidget(
-        child: Column(
-          children: [
-            _buildGridView(),
-          ],
+        child: Container(
+          color: Colors.grey.withOpacity(0.5),
+          child: Column(
+            children: [
+              _buildGridView(),
+            ],
+          ),
         ),
       ),
     );

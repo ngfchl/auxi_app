@@ -330,7 +330,7 @@ class _MySitePageState extends State<MySitePage>
     return GFCard(
       margin: const EdgeInsets.all(5),
       boxFit: BoxFit.cover,
-      color: Colors.transparent,
+      color: Colors.grey.withOpacity(0.5),
       // image: Image.asset('your asset image'),
       title: GFListTile(
         padding: const EdgeInsets.all(0.0),
