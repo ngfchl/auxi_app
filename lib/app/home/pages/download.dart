@@ -96,7 +96,7 @@ class _DownloadPageState
                 ),
           type: GFButtonType.transparent,
           onPressed: () {
-            getDownloaderConnectTest(downloader.id).then((res) {
+            controller.testConnect(downloader).then((res) {
               Get.snackbar(
                 '下载器连接测试',
                 '',

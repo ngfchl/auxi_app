@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auxi_app/models/common_response.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qbittorrent_api/qbittorrent_api.dart';
 import 'package:transmission_api/transmission_api.dart';
 
@@ -34,10 +35,41 @@ class DownloadController extends GetxController {
     update();
   }
 
+  Future<CommonResponse> testConnect(Downloader downloader) async {
+    try {
+      LoggerHelper.Logger.instance.w(downloader.name);
+      if (downloader.category.toLowerCase() == 'qb') {
+        final qbittorrent = QBittorrentApiV2(
+          baseUrl: '${downloader.http}://${downloader.host}:${downloader.port}',
+          cookiePath: (await getApplicationDocumentsDirectory()).path,
+          logger: true,
+        );
+        await qbittorrent.auth.login(
+          username: downloader.username!,
+          password: downloader.password!,
+        );
+        return CommonResponse(
+            data: null, msg: '${downloader.name} 连接成功!', code: 0);
+      } else {
+        final transmission = Transmission(
+          '${downloader.http}://${downloader.host}:${downloader.port}',
+          AuthKeys(downloader.username!, downloader.password!),
+        );
+        var res = await transmission.v1.session.sessionStats();
+        LoggerHelper.Logger.instance.w(res);
+        return CommonResponse(
+            data: null, msg: '${downloader.name} 连接成功!', code: 0);
+      }
+    } catch (error) {
+      return CommonResponse(
+          data: null, msg: '${downloader.name} 连接失败!', code: -1);
+    }
+  }
+
   Future getQbSpeed(Downloader downloader) async {
     final qbittorrent = QBittorrentApiV2(
       baseUrl: '${downloader.http}://${downloader.host}:${downloader.port}',
-      cookiePath: '.',
+      cookiePath: (await getApplicationDocumentsDirectory()).path,
       logger: true,
     );
     await qbittorrent.auth.login(
