@@ -88,13 +88,13 @@ class _DashBoardState extends State<DashBoard>
         },
         text: '刷新数据',
       ),
-      GFButton(
-        color: GFColors.WARNING,
-        onPressed: () {
-          Get.snackbar("提示", '开发中');
-        },
-        text: '一键辅种',
-      ),
+      // GFButton(
+      //   color: GFColors.WARNING,
+      //   onPressed: () {
+      //     Get.snackbar("提示", '开发中');
+      //   },
+      //   text: '一键辅种',
+      // ),
     ];
     return Container(
       padding: const EdgeInsets.all(8),
