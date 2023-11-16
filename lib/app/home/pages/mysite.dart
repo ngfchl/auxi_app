@@ -10,6 +10,7 @@ import 'package:proper_filesize/proper_filesize.dart';
 import '../../../../../utils/calc_weeks.dart';
 import '../../../../../utils/format_number.dart';
 import '../../../api/mysite.dart';
+import '../../../utils/logger_helper.dart';
 import '../models/site_status.dart';
 
 class MySitePage extends StatefulWidget {
@@ -60,19 +61,19 @@ class _MySitePageState extends State<MySitePage>
       body: GlassWidget(
         child: isLoaded
             ? EasyRefresh(
-                onRefresh: () async {
-                  getSiteStatusFromServer();
-                },
-                child: ListView.builder(
-                    itemCount: statusList.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      SiteStatus siteStatus = statusList[index];
-                      return showSiteDataInfo(siteStatus);
-                    }),
-              )
+          onRefresh: () async {
+            getSiteStatusFromServer();
+          },
+          child: ListView.builder(
+              itemCount: statusList.length,
+              itemBuilder: (BuildContext context, int index) {
+                SiteStatus siteStatus = statusList[index];
+                return showSiteDataInfo(siteStatus);
+              }),
+        )
             : const GFLoader(
-                type: GFLoaderType.circle,
-              ),
+          type: GFLoaderType.circle,
+        ),
       ),
       floatingActionButton: GFIconButton(
         icon: const Icon(Icons.add),
@@ -91,77 +92,11 @@ class _MySitePageState extends State<MySitePage>
   }
 
   Widget showSiteDataInfo(SiteStatus siteStatus) {
-    List<BrnNumberInfoItemModel> dataList = [
-      if (siteStatus.statusUploaded != null)
-        BrnNumberInfoItemModel(
-          title: '上传',
-          number: filesize(siteStatus.statusUploaded),
-        ),
-      if (siteStatus.statusDownloaded != null)
-        BrnNumberInfoItemModel(
-          title: '下载',
-          number: filesize(siteStatus.statusDownloaded),
-        ),
-      if (siteStatus.statusMyScore != null)
-        BrnNumberInfoItemModel(
-          title: '积分',
-          number: formatNumber(siteStatus.statusMyScore!),
-        ),
-      if (siteStatus.statusSeed != null)
-        BrnNumberInfoItemModel(
-          title: '做种',
-          number: '${siteStatus.statusSeed}',
-        ),
-      if (siteStatus.statusLeech != null)
-        BrnNumberInfoItemModel(
-          title: '吸血',
-          number: '${siteStatus.statusLeech}',
-        ),
-      if (siteStatus.statusMyBonus != null)
-        BrnNumberInfoItemModel(
-          title: '魔力',
-          number: formatNumber(siteStatus.statusMyBonus!),
-        ),
-      if (siteStatus.statusBonusHour != null)
-        BrnNumberInfoItemModel(
-          title: '时魔',
-          numberInfoIcon: BrnNumberInfoIcon.arrow,
-          number: formatNumber(siteStatus.statusBonusHour!),
-        ),
-      if (siteStatus.statusBonusHour != null &&
-          siteStatus.siteSpFull != null &&
-          siteStatus.siteSpFull! > 0)
-        BrnNumberInfoItemModel(
-          title: '满魔',
-          number: ((siteStatus.statusBonusHour! / siteStatus.siteSpFull!) * 100)
-              .toStringAsFixed(2),
-          lastDesc: '%',
-        ),
-      if (siteStatus.statusMyHr != null &&
-          siteStatus.statusMyHr != '' &&
-          siteStatus.statusMyHr != "0")
-        BrnNumberInfoItemModel(
-          topWidget: Text(
-            '${siteStatus.statusMyHr}',
-            style: const TextStyle(
-              color: Colors.red,
-              fontSize: 10,
-            ),
-          ),
-          bottomWidget: const Text(
-            'H&R',
-            style: TextStyle(
-              color: Colors.orange,
-              fontSize: 11,
-            ),
-          ),
-        ),
-    ];
     List<BrnNumberInfoItemModel> levelInfoList = [
       if (siteStatus.nextLevelRatio != null
-          // &&
-          // siteStatus.statusRatio! < siteStatus.nextLevelRatio!
-          )
+      // &&
+      // siteStatus.statusRatio! < siteStatus.nextLevelRatio!
+      )
         BrnNumberInfoItemModel(
           number: '${siteStatus.statusRatio}',
           lastDesc: '${siteStatus.nextLevelRatio}',
@@ -186,14 +121,14 @@ class _MySitePageState extends State<MySitePage>
           // ),
         ),
       if (siteStatus.statusUploaded != null &&
-              siteStatus.statusUploaded != null &&
-              siteStatus.nextLevelDownloaded != null
-          // &&
-          // siteStatus.statusUploaded! <
-          //     ProperFilesize.parseHumanReadableFilesize(
-          //             siteStatus.nextLevelDownloaded!) *
-          //         siteStatus.nextLevelRatio!
-          )
+          siteStatus.statusUploaded != null &&
+          siteStatus.nextLevelDownloaded != null
+      // &&
+      // siteStatus.statusUploaded! <
+      //     ProperFilesize.parseHumanReadableFilesize(
+      //             siteStatus.nextLevelDownloaded!) *
+      //         siteStatus.nextLevelRatio!
+      )
         BrnNumberInfoItemModel(
           number: filesize(siteStatus.statusUploaded),
           // topWidget: Row(
@@ -216,7 +151,7 @@ class _MySitePageState extends State<MySitePage>
           // ),
           lastDesc: ProperFilesize.generateHumanReadableFilesize(
               ProperFilesize.parseHumanReadableFilesize(
-                      siteStatus.nextLevelDownloaded!) *
+                  siteStatus.nextLevelDownloaded!) *
                   siteStatus.nextLevelRatio!,
               decimals: 2),
           title: '上传量',
@@ -229,11 +164,11 @@ class _MySitePageState extends State<MySitePage>
           // ),
         ),
       if (siteStatus.nextLevelDownloaded != null
-          // &&
-          // siteStatus.nextLevelDownloaded!.compareTo(
-          //         filesize(siteStatus.statusDownloaded)) > 0
+      // &&
+      // siteStatus.nextLevelDownloaded!.compareTo(
+      //         filesize(siteStatus.statusDownloaded)) > 0
 
-          )
+      )
         BrnNumberInfoItemModel(
           number: filesize(siteStatus.statusDownloaded),
           lastDesc: siteStatus.nextLevelDownloaded!,
@@ -327,8 +262,12 @@ class _MySitePageState extends State<MySitePage>
           // ),
         ),
     ];
+    Logger.instance.w(siteStatus.statusMyLevel);
+    Logger.instance.w(siteStatus.statusMyLevel?.length);
+    Logger.instance.w(siteStatus.statusMyLevel!.trim().length);
     return GFCard(
       margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8, top: 0),
       boxFit: BoxFit.cover,
       color: Colors.grey.withOpacity(0.5),
       // image: Image.asset('your asset image'),
@@ -336,9 +275,9 @@ class _MySitePageState extends State<MySitePage>
         padding: const EdgeInsets.all(0.0),
         avatar: GFAvatar(
           backgroundImage:
-              NetworkImage(siteStatus.siteLogo as String, headers: {}),
+          NetworkImage(siteStatus.siteLogo as String, headers: {}),
           shape: GFAvatarShape.standard,
-          size: GFSize.SMALL,
+          size: 20,
         ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -347,9 +286,10 @@ class _MySitePageState extends State<MySitePage>
               '${siteStatus.mySiteNickname ?? siteStatus.siteName}',
               style: const TextStyle(
                 color: Colors.white70,
-                fontSize: 14,
+                fontSize: 13,
               ),
             ),
+
             // if (siteStatus.statusMail != null && siteStatus.statusMail! > 0)
           ],
         ),
@@ -359,10 +299,10 @@ class _MySitePageState extends State<MySitePage>
             GFIconBadge(
               counterChild: GFBadge(
                 shape: GFBadgeShape.square,
-                size: 18,
+                size: 16,
                 child: Text("${siteStatus.statusMail}"),
               ),
-              position: GFBadgePosition.topEnd(top: 5, end: 0),
+              position: GFBadgePosition.topEnd(top: 5, end: 3),
               child: GFIconButton(
                 onPressed: () {
                   GFToast.showToast('打开邮件链接！', context);
@@ -375,75 +315,75 @@ class _MySitePageState extends State<MySitePage>
                 ),
               ),
             ),
-            if (siteStatus.statusMyLevel != null)
+            if (siteStatus.statusMyLevel != null &&
+                siteStatus.statusMyLevel!.trim().isNotEmpty)
               GFButton(
                 color: Colors.transparent,
                 // color: Colors.transparent,
                 text: '${siteStatus.statusMyLevel}',
                 // shape: GFButtonShape.pills,
-                onPressed: siteStatus.levelLevel == null
-                    ? null
-                    : () {
-                        if (siteStatus.nextLevelLevel == null) {
-                          GFToast.showToast('还没有配置本站点的用户等级信息！', context);
-                          return;
-                        }
-                        showDialog(
-                          context: context,
-                          barrierDismissible: true,
-                          builder: (BuildContext dialogContext) {
-                            return BrnDialog(
-                              divider: const Divider(
-                                height: 0,
-                                color: Colors.transparent,
+                size: 20,
+                onPressed: () {
+                  if (siteStatus.nextLevelLevel == null) {
+                    GFToast.showToast(
+                        '还没有配置本站点的用户等级信息！', context);
+                    return;
+                  }
+                  showDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (BuildContext dialogContext) {
+                      return BrnDialog(
+                        divider: const Divider(
+                          height: 0,
+                          color: Colors.transparent,
+                        ),
+                        themeData: BrnDialogConfig(
+                          dividerPadding: const EdgeInsets.all(0),
+                          mainActionBackgroundColor: Colors.teal.shade600,
+                          backgroundColor: Colors.teal.shade600,
+                          mainActionTextStyle: BrnTextStyle(
+                            color: Colors.white70,
+                          ),
+                        ),
+                        contentWidget: GFCard(
+                          boxFit: BoxFit.cover,
+                          color: Colors.transparent,
+                          title: GFListTile(
+                            title: Text(
+                              '当前等级：${siteStatus.statusMyLevel}',
+                              style: const TextStyle(
+                                color: Colors.orange,
+                                fontSize: 13,
                               ),
-                              themeData: BrnDialogConfig(
-                                dividerPadding: const EdgeInsets.all(0),
-                                mainActionBackgroundColor: Colors.teal.shade600,
-                                backgroundColor: Colors.teal.shade600,
-                                mainActionTextStyle: BrnTextStyle(
-                                  color: Colors.white70,
-                                ),
+                            ),
+                            subTitle: Text(
+                              '下一等级：${siteStatus.nextLevelLevel}',
+                              style: const TextStyle(
+                                color: Colors.deepOrange,
+                                fontSize: 13,
                               ),
-                              contentWidget: GFCard(
-                                boxFit: BoxFit.cover,
-                                color: Colors.transparent,
-                                title: GFListTile(
-                                  title: Text(
-                                    '当前等级：${siteStatus.statusMyLevel}',
-                                    style: const TextStyle(
-                                      color: Colors.orange,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  subTitle: Text(
-                                    '下一等级：${siteStatus.nextLevelLevel}',
-                                    style: const TextStyle(
-                                      color: Colors.deepOrange,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ),
-                                content: BrnEnhanceNumberCard(
-                                  rowCount: 1,
-                                  padding: const EdgeInsets.all(0),
-                                  itemChildren: levelInfoList,
-                                  backgroundColor: Colors.transparent,
-                                  themeData: BrnEnhanceNumberCardConfig(
-                                      titleTextStyle: BrnTextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                      descTextStyle: BrnTextStyle(
-                                          color: Colors.white70, fontSize: 12)),
-                                ),
-                              ),
-                              actionsText: const [
-                                '确定',
-                              ],
-                            );
-                          },
-                        );
-                      },
-                size: GFSize.SMALL,
+                            ),
+                          ),
+                          content: BrnEnhanceNumberCard(
+                            rowCount: 1,
+                            padding: const EdgeInsets.all(0),
+                            itemChildren: levelInfoList,
+                            backgroundColor: Colors.transparent,
+                            themeData: BrnEnhanceNumberCardConfig(
+                                titleTextStyle: BrnTextStyle(
+                                    color: Colors.white, fontSize: 20),
+                                descTextStyle: BrnTextStyle(
+                                    color: Colors.white70, fontSize: 12)),
+                          ),
+                        ),
+                        actionsText: const [
+                          '确定',
+                        ],
+                      );
+                    },
+                  );
+                },
                 textStyle: const TextStyle(
                   color: Colors.white60,
                 ),
@@ -487,40 +427,178 @@ class _MySitePageState extends State<MySitePage>
       ),
       content: Column(
         children: [
-          BrnEnhanceNumberCard(
-            rowCount: 3,
-            itemChildren: dataList,
-            runningSpace: 0,
-            itemRunningSpace: 0,
-            padding: const EdgeInsets.all(0),
-            backgroundColor: Colors.transparent,
-            themeData: BrnEnhanceNumberCardConfig(
-              runningSpace: -5,
-              itemRunningSpace: -5,
-              titleTextStyle: BrnTextStyle(
-                color: Colors.white,
-                fontSize: 16,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    textBaseline: TextBaseline.ideographic,
+                    children: [
+                      const Icon(
+                        Icons.upload_outlined,
+                        color: Colors.green,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${filesize(siteStatus.statusUploaded)} (${siteStatus
+                            .statusSeed})',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.download_outlined,
+                        color: Colors.red,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${filesize(siteStatus.statusDownloaded)} (${siteStatus
+                            .statusLeech})',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              descTextStyle: BrnTextStyle(
-                color: Colors.teal.shade800,
-                fontSize: 12,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (siteStatus.statusMyBonus != null)
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.ac_unit,
+                          color: Colors.white70,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          formatNumber(siteStatus.statusMyBonus!),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 5),
+                  if (siteStatus.statusMyScore != null)
+                    Row(
+                      textBaseline: TextBaseline.ideographic,
+                      children: [
+                        const Icon(
+                          Icons.score,
+                          color: Colors.white70,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          formatNumber(siteStatus.statusMyScore!),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
               ),
-            ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (siteStatus.statusBonusHour != null)
+                    Row(
+                      textBaseline: TextBaseline.ideographic,
+                      children: [
+                        const Icon(
+                          Icons.timer_outlined,
+                          color: Colors.white70,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          '${formatNumber(
+                              siteStatus.statusBonusHour!)}(${siteStatus
+                              .statusBonusHour != null &&
+                              siteStatus.siteSpFull != null &&
+                              siteStatus.siteSpFull! > 0 ? ((siteStatus
+                              .statusBonusHour! / siteStatus.siteSpFull!) * 100)
+                              .toStringAsFixed(2) : '0'}%)',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 5),
+                  if (siteStatus.statusSeedVolume != null)
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.cloud_upload_outlined,
+                          color: Colors.white70,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          filesize(siteStatus.statusSeedVolume),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ],
           ),
           const SizedBox(
-            height: 3,
+            height: 5,
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+
               if (siteStatus.statusUpdatedAt != null)
                 Text(
-                  '最近更新时间：${siteStatus.statusUpdatedAt?.replaceAll('T', ' ')}',
+                  '最近更新：${siteStatus.statusUpdatedAt?.replaceAll(
+                      'T', ' ')}',
                   textAlign: TextAlign.right,
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 10,
                   ),
+                ),
+              if (siteStatus.statusMyHr != null &&
+                  siteStatus.statusMyHr != '' &&
+                  siteStatus.statusMyHr != "0")
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'HR：${siteStatus.statusMyHr!.replaceAll('区', '')}',
+                      textAlign: TextAlign.right,
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
                 ),
             ],
           ),
@@ -545,7 +623,8 @@ class _MySitePageState extends State<MySitePage>
                   } else {
                     Get.snackbar(
                       '签到失败',
-                      '${siteStatus.mySiteNickname!} 签到任务执行出错啦：${res.msg}',
+                      '${siteStatus.mySiteNickname!} 签到任务执行出错啦：${res
+                          .msg}',
                       colorText: Colors.red,
                       backgroundColor: Colors.teal.withOpacity(0.7),
                     );
