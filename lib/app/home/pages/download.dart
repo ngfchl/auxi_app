@@ -1,4 +1,5 @@
-import 'package:bruno/bruno.dart';
+import 'dart:async';
+
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +46,6 @@ class _DownloadPageState
         );
       }
     }).catchError((e) => GFToast.showToast(e.toString(), context));
-
     super.initState();
   }
 
@@ -58,7 +58,7 @@ class _DownloadPageState
       margin: const EdgeInsets.all(5),
       padding: const EdgeInsets.only(left: 0, right: 0, bottom: 15),
       boxFit: BoxFit.cover,
-      color: Colors.grey.withOpacity(0.5),
+      color: Colors.teal.withOpacity(0.9),
       title: GFListTile(
         padding: const EdgeInsets.all(0),
         avatar: GFAvatar(
@@ -200,118 +200,289 @@ class _DownloadPageState
     );
   }
 
-  getSpeedInfo(downloader) {
+  handlerSpeedInfo(downloader) {
+    Widget infoCard = const GFLoader();
+    Timer.periodic(const Duration(seconds: 3), (timer) {
+      //倒计时结束
+      LoggerHelper.Logger.instance.w('afterTimer = ${DateTime.now()}');
+      infoCard = getSpeedInfo(downloader);
+      controller.speedInfo[downloader.id] = infoCard;
+      controller.update();
+    });
+  }
+
+  Widget getSpeedInfo(Downloader downloader) {
     return FutureBuilder(
-        future: downloader.category == 'Qb'
-            ? controller.getQbSpeed(downloader)
-            : controller.getTrSpeed(downloader),
+        future: controller.getIntervalSpeed(downloader),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             LoggerHelper.Logger.instance.w(snapshot.data);
             if (snapshot.data == null) {
-              return const GFLoader(
-                type: GFLoaderType.custom,
-                loaderIconOne: Icon(
-                  Icons.insert_emoticon,
-                  color: Colors.orange,
-                  size: 12,
+              return const GFLoader();
+            }
+            var res = snapshot.data.data;
+            if (downloader.category == 'Qb') {
+              return Container(
+                padding: const EdgeInsets.only(left: 15, right: 15),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              textBaseline: TextBaseline.ideographic,
+                              children: [
+                                const Icon(
+                                  Icons.upload_outlined,
+                                  color: Colors.green,
+                                  size: 14,
+                                ),
+                                const SizedBox(
+                                  width: 2,
+                                ),
+                                Text(
+                                  '${filesize(res.upInfoSpeed!.toString(), 0)}/S ',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.download_outlined,
+                                  color: Colors.red,
+                                  size: 14,
+                                ),
+                                const SizedBox(
+                                  width: 2,
+                                ),
+                                Text(
+                                  '${filesize(res.dlInfoSpeed!.toString(), 0)}/S ',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.cloud_upload_rounded,
+                                  color: Colors.green,
+                                  size: 14,
+                                ),
+                                const SizedBox(
+                                  width: 2,
+                                ),
+                                Text(
+                                  filesize(res.upInfoData),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.cloud_download_rounded,
+                                  color: Colors.red,
+                                  size: 14,
+                                ),
+                                const SizedBox(
+                                  width: 2,
+                                ),
+                                Text(
+                                  filesize(res.dlInfoData),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '上传限速：${filesize(res.upRateLimit)}/S',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.white70,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            Text(
+                              '下载限速：${filesize(res.dlInfoSpeed)}/S',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                loaderIconTwo: Icon(
-                  Icons.insert_emoticon,
-                  color: Colors.red,
-                  size: 14,
-                ),
-                loaderIconThree: Icon(
-                  Icons.insert_emoticon,
-                  color: Colors.purple,
-                  size: 12,
+              );
+            } else {
+              LoggerHelper.Logger.instance.w(res.runtimeType);
+              return Container(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          textBaseline: TextBaseline.ideographic,
+                          children: [
+                            const Icon(
+                              Icons.upload_outlined,
+                              color: Colors.green,
+                              size: 14,
+                            ),
+                            const SizedBox(
+                              width: 2,
+                            ),
+                            Text(
+                              '${filesize(res.uploadSpeed!.toString(), 0)}/S ',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.download_outlined,
+                              color: Colors.red,
+                              size: 14,
+                            ),
+                            const SizedBox(
+                              width: 2,
+                            ),
+                            Text(
+                              '${filesize(res.downloadSpeed!.toString(), 0)}/S ',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.cloud_upload_rounded,
+                              color: Colors.green,
+                              size: 14,
+                            ),
+                            const SizedBox(
+                              width: 2,
+                            ),
+                            Text(
+                              filesize(res.currentStats.uploadedBytes),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.cloud_download_rounded,
+                              color: Colors.red,
+                              size: 14,
+                            ),
+                            const SizedBox(
+                              width: 2,
+                            ),
+                            Text(
+                              filesize(res.currentStats.downloadedBytes),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '活动种子：${res.activeTorrentCount!}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          '暂停种子：${res.pausedTorrentCount!}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               );
             }
-            var res = snapshot.data.data;
-            List<BrnNumberInfoItemModel> items = [];
-            if (downloader.category == 'Qb') {
-              items = [
-                BrnNumberInfoItemModel(
-                  title: '上传',
-                  // topWidget: Row(
-                  //   children: [
-                  //     Text(
-                  //       '${filesize(res.upInfoSpeed!, 0)}/S',
-                  //       style: const TextStyle(
-                  //         fontSize: 20,
-                  //         fontWeight: FontWeight.w300,
-                  //         color: Colors.white70,
-                  //       ),
-                  //     ),
-                  //     Text(
-                  //       filesize(res.upInfoData),
-                  //       style: const TextStyle(
-                  //         fontWeight: FontWeight.w300,
-                  //         color: Colors.white70,
-                  //       ),
-                  //     )
-                  //   ],
-                  // ),
-                  number: '${filesize(res.upInfoSpeed!.toString(), 0)}/S ',
-                  lastDesc: filesize(res.upInfoData),
-                ),
-                BrnNumberInfoItemModel(
-                  title: '下载',
-                  number: '${filesize(res.dlInfoSpeed!.toString(), 0)}/S ',
-                  lastDesc: filesize(res.dlInfoData),
-                ),
-                BrnNumberInfoItemModel(
-                  title: '上传限速',
-                  number: "${filesize(res.upRateLimit!.toString())}/S ",
-                ),
-                BrnNumberInfoItemModel(
-                  title: '下载限速',
-                  number: "${filesize(res.dlInfoSpeed!.toString())}/S ",
-                ),
-              ];
-            } else {
-              LoggerHelper.Logger.instance.w(res.runtimeType);
-              items = [
-                BrnNumberInfoItemModel(
-                  title: '上传',
-                  number: filesize(res.uploadSpeed!.toString()),
-                  lastDesc: filesize(res.currentStats.downloadedBytes),
-                  // preDesc: '${filesize(res.upRateLimit)}/S',
-                ),
-                BrnNumberInfoItemModel(
-                  title: '下载',
-                  number: filesize(res.downloadSpeed!.toString()),
-                  lastDesc: filesize(res.currentStats.uploadedBytes),
-                  // preDesc: '${filesize(res.dlRateLimit)}/S',
-                ),
-                BrnNumberInfoItemModel(
-                  title: '活动种子',
-                  number: res.activeTorrentCount!.toString(),
-                  lastDesc: res.torrentCount!.toString(),
-                ),
-                BrnNumberInfoItemModel(
-                  title: '暂停种子',
-                  number: res.pausedTorrentCount!.toString(),
-                ),
-              ];
-            }
-            return BrnEnhanceNumberCard(
-                backgroundColor: Colors.transparent,
-                rowCount: 2,
-                itemChildren: items,
-                themeData: BrnEnhanceNumberCardConfig(
-                  descTextStyle: BrnTextStyle(
-                    color: Colors.white70,
-                    fontSize: 11,
-                  ),
-                  titleTextStyle: BrnTextStyle(
-                    color: Colors.white70,
-                    fontSize: 15,
-                  ),
-                ));
           }
-          return const Text('下载器链接失败！');
+          return const GFLoader();
         });
   }
 }

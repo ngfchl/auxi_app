@@ -14,10 +14,12 @@ import '../../../../utils/logger_helper.dart' as LoggerHelper;
 class DownloadController extends GetxController {
   bool isLoaded = false;
   List<Downloader> dataList = [];
+  Map<int, dynamic> speedInfo = {};
 
   @override
   void onInit() {
     getDownloaderListFromServer();
+
     super.onInit();
   }
 
@@ -100,26 +102,8 @@ class DownloadController extends GetxController {
   }
 
   dynamic getIntervalSpeed(Downloader downloader, {int duration = 5}) {
-    dynamic speedInfo;
-    Timer.periodic(Duration(seconds: duration), (timer) {
-      //到时回调
-      downloader.category == 'Qb'
-          ? getQbSpeed(downloader).then((value) {
-              if (value.code == 0) {
-                speedInfo = value.data;
-              } else {
-                speedInfo = null;
-              }
-            })
-          : getTrSpeed(downloader).then((value) {
-              if (value.code == 0) {
-                speedInfo = value.data;
-              } else {
-                speedInfo = null;
-              }
-            });
-    });
-    LoggerHelper.Logger.instance.w(speedInfo);
-    return speedInfo;
+    return downloader.category == 'Qb'
+        ? getQbSpeed(downloader)
+        : getTrSpeed(downloader);
   }
 }
