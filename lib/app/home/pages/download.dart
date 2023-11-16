@@ -55,8 +55,8 @@ class _DownloadPageState
     //   connectState = res.code == 0;
     // });
     return GFCard(
-      margin: const EdgeInsets.all(5),
-      padding: const EdgeInsets.only(left: 0, right: 0, bottom: 15),
+      margin: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
+      padding: const EdgeInsets.only(left: 0, right: 0, bottom: 10),
       boxFit: BoxFit.cover,
       color: Colors.teal.withOpacity(0.9),
       title: GFListTile(
@@ -215,11 +215,34 @@ class _DownloadPageState
     return FutureBuilder(
         future: controller.getIntervalSpeed(downloader),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const GFLoader();
+          }
           if (snapshot.connectionState == ConnectionState.done) {
             LoggerHelper.Logger.instance.w(snapshot.data);
             if (snapshot.data == null) {
-              return const GFLoader();
+              return const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.warning_amber,
+                    color: Colors.amber,
+                    size: 14,
+                  ),
+                  SizedBox(width: 3),
+                  Text(
+                    '出错啦！',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              );
             }
+
+            LoggerHelper.Logger.instance.w(snapshot.data.code);
+
             var res = snapshot.data.data;
             if (downloader.category == 'Qb') {
               return Container(
@@ -242,11 +265,9 @@ class _DownloadPageState
                                   color: Colors.green,
                                   size: 14,
                                 ),
-                                const SizedBox(
-                                  width: 2,
-                                ),
+                                const SizedBox(width: 2),
                                 Text(
-                                  '${filesize(res.upInfoSpeed!.toString(), 0)}/S ',
+                                  '${filesize(res.upInfoSpeed!.toString(), 0)}/S',
                                   style: const TextStyle(
                                     fontSize: 13,
                                     color: Colors.white70,
@@ -254,9 +275,7 @@ class _DownloadPageState
                                 ),
                               ],
                             ),
-                            const SizedBox(
-                              height: 8,
-                            ),
+                            const SizedBox(height: 8),
                             Row(
                               children: [
                                 const Icon(
@@ -264,11 +283,9 @@ class _DownloadPageState
                                   color: Colors.red,
                                   size: 14,
                                 ),
-                                const SizedBox(
-                                  width: 2,
-                                ),
+                                const SizedBox(width: 2),
                                 Text(
-                                  '${filesize(res.dlInfoSpeed!.toString(), 0)}/S ',
+                                  '${filesize(res.dlInfoSpeed!.toString(), 0)}/S',
                                   style: const TextStyle(
                                     fontSize: 13,
                                     color: Colors.white70,
@@ -288,9 +305,7 @@ class _DownloadPageState
                                   color: Colors.green,
                                   size: 14,
                                 ),
-                                const SizedBox(
-                                  width: 2,
-                                ),
+                                const SizedBox(width: 2),
                                 Text(
                                   filesize(res.upInfoData),
                                   style: const TextStyle(
@@ -300,9 +315,7 @@ class _DownloadPageState
                                 ),
                               ],
                             ),
-                            const SizedBox(
-                              height: 8,
-                            ),
+                            const SizedBox(height: 8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -311,9 +324,7 @@ class _DownloadPageState
                                   color: Colors.red,
                                   size: 14,
                                 ),
-                                const SizedBox(
-                                  width: 2,
-                                ),
+                                const SizedBox(width: 2),
                                 Text(
                                   filesize(res.dlInfoData),
                                   style: const TextStyle(
@@ -335,9 +346,7 @@ class _DownloadPageState
                                 color: Colors.white70,
                               ),
                             ),
-                            const SizedBox(
-                              height: 8,
-                            ),
+                            const SizedBox(height: 8),
                             Text(
                               '下载限速：${filesize(res.dlInfoSpeed)}/S',
                               style: const TextStyle(
@@ -372,11 +381,9 @@ class _DownloadPageState
                               color: Colors.green,
                               size: 14,
                             ),
-                            const SizedBox(
-                              width: 2,
-                            ),
+                            const SizedBox(width: 2),
                             Text(
-                              '${filesize(res.uploadSpeed!.toString(), 0)}/S ',
+                              '${filesize(res.uploadSpeed!.toString(), 0)}/S',
                               style: const TextStyle(
                                 fontSize: 13,
                                 color: Colors.white70,
@@ -384,9 +391,7 @@ class _DownloadPageState
                             ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
+                        const SizedBox(height: 8),
                         Row(
                           children: [
                             const Icon(
@@ -394,11 +399,9 @@ class _DownloadPageState
                               color: Colors.red,
                               size: 14,
                             ),
-                            const SizedBox(
-                              width: 2,
-                            ),
+                            const SizedBox(width: 2),
                             Text(
-                              '${filesize(res.downloadSpeed!.toString(), 0)}/S ',
+                              '${filesize(res.downloadSpeed!.toString(), 0)}/S',
                               style: const TextStyle(
                                 fontSize: 13,
                                 color: Colors.white70,
@@ -418,9 +421,7 @@ class _DownloadPageState
                               color: Colors.green,
                               size: 14,
                             ),
-                            const SizedBox(
-                              width: 2,
-                            ),
+                            const SizedBox(width: 2),
                             Text(
                               filesize(res.currentStats.uploadedBytes),
                               style: const TextStyle(
@@ -430,9 +431,7 @@ class _DownloadPageState
                             ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
+                        const SizedBox(height: 8),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -441,9 +440,7 @@ class _DownloadPageState
                               color: Colors.red,
                               size: 14,
                             ),
-                            const SizedBox(
-                              width: 2,
-                            ),
+                            const SizedBox(width: 2),
                             Text(
                               filesize(res.currentStats.downloadedBytes),
                               style: const TextStyle(
