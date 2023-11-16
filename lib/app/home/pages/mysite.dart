@@ -61,19 +61,19 @@ class _MySitePageState extends State<MySitePage>
       body: GlassWidget(
         child: isLoaded
             ? EasyRefresh(
-          onRefresh: () async {
-            getSiteStatusFromServer();
-          },
-          child: ListView.builder(
-              itemCount: statusList.length,
-              itemBuilder: (BuildContext context, int index) {
-                SiteStatus siteStatus = statusList[index];
-                return showSiteDataInfo(siteStatus);
-              }),
-        )
+                onRefresh: () async {
+                  getSiteStatusFromServer();
+                },
+                child: ListView.builder(
+                    itemCount: statusList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      SiteStatus siteStatus = statusList[index];
+                      return showSiteDataInfo(siteStatus);
+                    }),
+              )
             : const GFLoader(
-          type: GFLoaderType.circle,
-        ),
+                type: GFLoaderType.circle,
+              ),
       ),
       floatingActionButton: GFIconButton(
         icon: const Icon(Icons.add),
@@ -94,9 +94,9 @@ class _MySitePageState extends State<MySitePage>
   Widget showSiteDataInfo(SiteStatus siteStatus) {
     List<BrnNumberInfoItemModel> levelInfoList = [
       if (siteStatus.nextLevelRatio != null
-      // &&
-      // siteStatus.statusRatio! < siteStatus.nextLevelRatio!
-      )
+          // &&
+          // siteStatus.statusRatio! < siteStatus.nextLevelRatio!
+          )
         BrnNumberInfoItemModel(
           number: '${siteStatus.statusRatio}',
           lastDesc: '${siteStatus.nextLevelRatio}',
@@ -121,14 +121,14 @@ class _MySitePageState extends State<MySitePage>
           // ),
         ),
       if (siteStatus.statusUploaded != null &&
-          siteStatus.statusUploaded != null &&
-          siteStatus.nextLevelDownloaded != null
-      // &&
-      // siteStatus.statusUploaded! <
-      //     ProperFilesize.parseHumanReadableFilesize(
-      //             siteStatus.nextLevelDownloaded!) *
-      //         siteStatus.nextLevelRatio!
-      )
+              siteStatus.statusUploaded != null &&
+              siteStatus.nextLevelDownloaded != null
+          // &&
+          // siteStatus.statusUploaded! <
+          //     ProperFilesize.parseHumanReadableFilesize(
+          //             siteStatus.nextLevelDownloaded!) *
+          //         siteStatus.nextLevelRatio!
+          )
         BrnNumberInfoItemModel(
           number: filesize(siteStatus.statusUploaded),
           // topWidget: Row(
@@ -151,7 +151,7 @@ class _MySitePageState extends State<MySitePage>
           // ),
           lastDesc: ProperFilesize.generateHumanReadableFilesize(
               ProperFilesize.parseHumanReadableFilesize(
-                  siteStatus.nextLevelDownloaded!) *
+                      siteStatus.nextLevelDownloaded!) *
                   siteStatus.nextLevelRatio!,
               decimals: 2),
           title: '上传量',
@@ -164,11 +164,11 @@ class _MySitePageState extends State<MySitePage>
           // ),
         ),
       if (siteStatus.nextLevelDownloaded != null
-      // &&
-      // siteStatus.nextLevelDownloaded!.compareTo(
-      //         filesize(siteStatus.statusDownloaded)) > 0
+          // &&
+          // siteStatus.nextLevelDownloaded!.compareTo(
+          //         filesize(siteStatus.statusDownloaded)) > 0
 
-      )
+          )
         BrnNumberInfoItemModel(
           number: filesize(siteStatus.statusDownloaded),
           lastDesc: siteStatus.nextLevelDownloaded!,
@@ -272,11 +272,12 @@ class _MySitePageState extends State<MySitePage>
       color: Colors.grey.withOpacity(0.5),
       // image: Image.asset('your asset image'),
       title: GFListTile(
-        padding: const EdgeInsets.all(0.0),
+        padding: EdgeInsets.zero,
         avatar: GFAvatar(
           backgroundImage:
-          NetworkImage(siteStatus.siteLogo as String, headers: {}),
-          shape: GFAvatarShape.standard,
+              NetworkImage(siteStatus.siteLogo as String, headers: {}),
+          shape: GFAvatarShape.square,
+          backgroundColor: Colors.transparent,
           size: 20,
         ),
         title: Row(
@@ -289,32 +290,31 @@ class _MySitePageState extends State<MySitePage>
                 fontSize: 13,
               ),
             ),
-
-            // if (siteStatus.statusMail != null && siteStatus.statusMail! > 0)
           ],
         ),
         icon: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GFIconBadge(
-              counterChild: GFBadge(
-                shape: GFBadgeShape.square,
-                size: 16,
-                child: Text("${siteStatus.statusMail}"),
-              ),
-              position: GFBadgePosition.topEnd(top: 5, end: 3),
-              child: GFIconButton(
-                onPressed: () {
-                  GFToast.showToast('打开邮件链接！', context);
-                },
-                size: GFSize.SMALL,
-                type: GFButtonType.transparent,
-                icon: const Icon(
-                  Icons.mail_outline,
-                  color: Colors.white70,
+            if (siteStatus.statusMail != null && siteStatus.statusMail! > 0)
+              GFIconBadge(
+                counterChild: GFBadge(
+                  shape: GFBadgeShape.square,
+                  size: 16,
+                  child: Text("${siteStatus.statusMail}"),
+                ),
+                position: GFBadgePosition.topEnd(top: 5, end: 3),
+                child: GFIconButton(
+                  onPressed: () {
+                    GFToast.showToast('打开邮件链接！', context);
+                  },
+                  size: GFSize.SMALL,
+                  type: GFButtonType.transparent,
+                  icon: const Icon(
+                    Icons.mail_outline,
+                    color: Colors.white70,
+                  ),
                 ),
               ),
-            ),
             if (siteStatus.statusMyLevel != null &&
                 siteStatus.statusMyLevel!.trim().isNotEmpty)
               GFButton(
@@ -325,8 +325,7 @@ class _MySitePageState extends State<MySitePage>
                 size: 20,
                 onPressed: () {
                   if (siteStatus.nextLevelLevel == null) {
-                    GFToast.showToast(
-                        '还没有配置本站点的用户等级信息！', context);
+                    GFToast.showToast('还没有配置本站点的用户等级信息！', context);
                     return;
                   }
                   showDialog(
@@ -443,8 +442,7 @@ class _MySitePageState extends State<MySitePage>
                       ),
                       const SizedBox(width: 2),
                       Text(
-                        '${filesize(siteStatus.statusUploaded)} (${siteStatus
-                            .statusSeed})',
+                        '${filesize(siteStatus.statusUploaded)} (${siteStatus.statusSeed})',
                         style: const TextStyle(
                           fontSize: 12,
                           color: Colors.white70,
@@ -462,8 +460,7 @@ class _MySitePageState extends State<MySitePage>
                       ),
                       const SizedBox(width: 2),
                       Text(
-                        '${filesize(siteStatus.statusDownloaded)} (${siteStatus
-                            .statusLeech})',
+                        '${filesize(siteStatus.statusDownloaded)} (${siteStatus.statusLeech})',
                         style: const TextStyle(
                           fontSize: 12,
                           color: Colors.white70,
@@ -476,67 +473,19 @@ class _MySitePageState extends State<MySitePage>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (siteStatus.statusMyBonus != null)
+                  if (siteStatus.statusRatio != null)
                     Row(
                       children: [
-                        const Icon(
-                          Icons.ac_unit,
-                          color: Colors.white70,
+                        Icon(
+                          Icons.ios_share,
+                          color: siteStatus.statusRatio! > 1
+                              ? Colors.white70
+                              : Colors.deepOrange,
                           size: 14,
                         ),
                         const SizedBox(width: 2),
                         Text(
-                          formatNumber(siteStatus.statusMyBonus!),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ),
-                        ),
-                      ],
-                    ),
-                  const SizedBox(height: 5),
-                  if (siteStatus.statusMyScore != null)
-                    Row(
-                      textBaseline: TextBaseline.ideographic,
-                      children: [
-                        const Icon(
-                          Icons.score,
-                          color: Colors.white70,
-                          size: 14,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          formatNumber(siteStatus.statusMyScore!),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (siteStatus.statusBonusHour != null)
-                    Row(
-                      textBaseline: TextBaseline.ideographic,
-                      children: [
-                        const Icon(
-                          Icons.timer_outlined,
-                          color: Colors.white70,
-                          size: 14,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          '${formatNumber(
-                              siteStatus.statusBonusHour!)}(${siteStatus
-                              .statusBonusHour != null &&
-                              siteStatus.siteSpFull != null &&
-                              siteStatus.siteSpFull! > 0 ? ((siteStatus
-                              .statusBonusHour! / siteStatus.siteSpFull!) * 100)
-                              .toStringAsFixed(2) : '0'}%)',
+                          formatNumber(siteStatus.statusRatio!),
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.white70,
@@ -565,6 +514,50 @@ class _MySitePageState extends State<MySitePage>
                     ),
                 ],
               ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (siteStatus.statusBonusHour != null)
+                    Row(
+                      textBaseline: TextBaseline.ideographic,
+                      children: [
+                        const Icon(
+                          Icons.timer_outlined,
+                          color: Colors.white70,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          '${formatNumber(siteStatus.statusBonusHour!)}(${siteStatus.statusBonusHour != null && siteStatus.siteSpFull != null && siteStatus.siteSpFull! > 0 ? ((siteStatus.statusBonusHour! / siteStatus.siteSpFull!) * 100).toStringAsFixed(2) : '0'}%)',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 5),
+                  if (siteStatus.statusMyBonus != null)
+                    Row(
+                      textBaseline: TextBaseline.ideographic,
+                      children: [
+                        const Icon(
+                          Icons.score,
+                          color: Colors.white70,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          '${formatNumber(siteStatus.statusMyBonus!)}(${formatNumber(siteStatus.statusMyScore!)})',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
             ],
           ),
           const SizedBox(
@@ -573,15 +566,13 @@ class _MySitePageState extends State<MySitePage>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-
               if (siteStatus.statusUpdatedAt != null)
                 Text(
-                  '最近更新：${siteStatus.statusUpdatedAt?.replaceAll(
-                      'T', ' ')}',
+                  '最近更新：${siteStatus.statusUpdatedAt?.replaceAll('T', ' ')}',
                   textAlign: TextAlign.right,
                   style: const TextStyle(
                     color: Colors.white70,
-                    fontSize: 10,
+                    fontSize: 10.5,
                   ),
                 ),
               if (siteStatus.statusMyHr != null &&
@@ -595,7 +586,7 @@ class _MySitePageState extends State<MySitePage>
                       textAlign: TextAlign.right,
                       style: const TextStyle(
                         color: Colors.red,
-                        fontSize: 10,
+                        fontSize: 10.5,
                       ),
                     ),
                   ],
@@ -623,8 +614,7 @@ class _MySitePageState extends State<MySitePage>
                   } else {
                     Get.snackbar(
                       '签到失败',
-                      '${siteStatus.mySiteNickname!} 签到任务执行出错啦：${res
-                          .msg}',
+                      '${siteStatus.mySiteNickname!} 签到任务执行出错啦：${res.msg}',
                       colorText: Colors.red,
                       backgroundColor: Colors.teal.withOpacity(0.7),
                     );
