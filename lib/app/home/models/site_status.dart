@@ -17,14 +17,14 @@ class SiteStatus {
   int? statusMail;
   String? statusMyHr;
   int? statusSeedVolume;
-  double? statusMyBonus;
+  num? statusMyBonus;
   int? statusDownloaded;
-  double? statusBonusHour;
+  num? statusBonusHour;
   int? statusInvitation;
-  double? statusMyScore;
+  num? statusMyScore;
   int? statusLeech;
   String? statusMyLevel;
-  double? statusRatio;
+  num? statusRatio;
   String? statusUpdatedAt;
   bool? signSignInToday;
   String? levelLevel;
@@ -34,9 +34,9 @@ class SiteStatus {
   int? nextLevelTorrents;
   String? nextLevelUploaded;
   String? nextLevelRights;
-  double? nextLevelScore;
-  double? nextLevelBonus;
-  double? nextLevelRatio;
+  num? nextLevelScore;
+  num? nextLevelBonus;
+  num? nextLevelRatio;
 
   SiteStatus(
       {this.siteName,
@@ -158,6 +158,99 @@ class SiteStatus {
     data['next_level_score'] = nextLevelScore;
     data['next_level_bonus'] = nextLevelBonus;
     data['next_level_ratio'] = nextLevelRatio;
+    return data;
+  }
+}
+
+class SiteBaseStatus {
+  int? id;
+  String? updatedAt;
+  int? site;
+  int? uploaded;
+  int? downloaded;
+  num? ratio;
+  num? myBonus;
+  num? myScore;
+  int? seedVolume;
+  int? seedDays;
+  int? leech;
+  int? seed;
+  num? bonusHour;
+  int? publish;
+  int? invitation;
+  String? myLevel;
+  String? myHr;
+  int? mail;
+  String? updated;
+  String? updatedDate;
+
+  SiteBaseStatus(
+      {this.id,
+      this.updatedAt,
+      this.site,
+      this.uploaded,
+      this.downloaded,
+      this.ratio,
+      this.myBonus,
+      this.myScore,
+      this.seedVolume,
+      this.seedDays,
+      this.leech,
+      this.seed,
+      this.bonusHour,
+      this.publish,
+      this.invitation,
+      this.myLevel,
+      this.myHr,
+      this.mail,
+      this.updated,
+      this.updatedDate});
+
+  SiteBaseStatus.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    updatedAt = json['updated_at'];
+    site = json['site'];
+    uploaded = json['uploaded'];
+    downloaded = json['downloaded'];
+    ratio = json['ratio'];
+    myBonus = json['my_bonus'];
+    myScore = json['my_score'];
+    seedVolume = json['seed_volume'];
+    seedDays = json['seed_days'];
+    leech = json['leech'];
+    seed = json['seed'];
+    bonusHour = json['bonus_hour'];
+    publish = json['publish'];
+    invitation = json['invitation'];
+    myLevel = json['my_level'];
+    myHr = json['my_hr'];
+    mail = json['mail'];
+    updated = json['updated'];
+    updatedDate = json['updated_date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['updated_at'] = updatedAt;
+    data['site'] = site;
+    data['uploaded'] = uploaded;
+    data['downloaded'] = downloaded;
+    data['ratio'] = ratio;
+    data['my_bonus'] = myBonus;
+    data['my_score'] = myScore;
+    data['seed_volume'] = seedVolume;
+    data['seed_days'] = seedDays;
+    data['leech'] = leech;
+    data['seed'] = seed;
+    data['bonus_hour'] = bonusHour;
+    data['publish'] = publish;
+    data['invitation'] = invitation;
+    data['my_level'] = myLevel;
+    data['my_hr'] = myHr;
+    data['mail'] = mail;
+    data['updated'] = updated;
+    data['updated_date'] = updatedDate;
     return data;
   }
 }
