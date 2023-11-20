@@ -133,3 +133,47 @@ editMySite(int mySiteId) async {}
 
 /// 保存站点信息
 saveMySite(int mySiteId) async {}
+
+/// 获取图表接口
+Future<CommonResponse> getMySiteChart({
+  int siteId = 0,
+  int days = 7,
+}) async {
+  final response = await DioClient().get(
+    Api.MYSITE_STATUS_CHART_V2,
+    queryParameters: {
+      "site_id": siteId,
+      "days": days,
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return CommonResponse(data: response.data['data'], code: 0, msg: '');
+  } else {
+    String msg = '获取主页状态失败: ${response.statusCode}';
+    // GFToast.showToast(msg, context);
+    return CommonResponse(data: null, code: -1, msg: msg);
+  }
+}
+
+/// 获取图表接口
+Future<CommonResponse> getMySiteChartV2({
+  int siteId = 0,
+  int days = 7,
+}) async {
+  final response = await DioClient().get(
+    Api.MYSITE_STATUS_CHART_V2,
+    queryParameters: {
+      "site_id": siteId,
+      "days": days,
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return CommonResponse(data: response.data['data'], code: 0, msg: '');
+  } else {
+    String msg = '获取主页状态失败: ${response.statusCode}';
+    // GFToast.showToast(msg, context);
+    return CommonResponse(data: null, code: -1, msg: msg);
+  }
+}

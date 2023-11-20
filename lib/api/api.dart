@@ -19,6 +19,7 @@ class Api {
   static const String MYSITE_SIGNIN_DO_AUTO = "mysite/sign/do";
   static const String MYSITE_IMPORT = "mysite/import";
   static const String MYSITE_STATUS_CHART = "mysite/status/chart";
+  static const String MYSITE_STATUS_CHART_V2 = "mysite/status/chart/v2";
   static const String MYSITE_SORT = "mysite/sort";
   static const String MYSITE_STATUS_TODAY = "mysite/status/today";
 
