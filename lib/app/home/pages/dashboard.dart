@@ -5,8 +5,12 @@ import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:proper_filesize/proper_filesize.dart';
+import 'package:random_color/random_color.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import '../../../utils/logger_helper.dart';
+import '../models/mysite.dart';
 import '../models/site_status.dart';
 
 class DashBoard extends StatefulWidget {
@@ -24,7 +28,13 @@ class _DashBoardState extends State<DashBoard>
   bool get wantKeepAlive => true;
 
   List<SiteStatus> statusList = [];
-  TooltipBehavior? _tooltipBehavior;
+  List<Map<String, dynamic>> pieDataList = [
+    {
+      'genre': '站点',
+      'sold': 10240000,
+    }
+  ];
+  List<Map> stackChartDataList = [];
   int uploaded = 0;
   int downloaded = 0;
   int seedVol = 0;
@@ -32,46 +42,55 @@ class _DashBoardState extends State<DashBoard>
   @override
   void initState() {
     initPieChartData();
+
     super.initState();
   }
 
   void initPieChartData() {
+    getMySiteChartV2().then((value) {
+      if (value.code == 0) {
+        // Logger.instance.w(value.data);
+        setState(() {
+          stackChartDataList.clear();
+          value.data.forEach((element) {
+            Logger.instance.w(element);
+            MySite mySite = MySite.fromJson(element['site']);
+            List<SiteBaseStatus> statusList = element['data']
+                .map<SiteBaseStatus>((item) => SiteBaseStatus.fromJson(item))
+                .toList();
+            statusList.sort((SiteBaseStatus a, SiteBaseStatus b) =>
+                a.updatedDate!.compareTo(b.updatedDate!));
+            stackChartDataList
+                .add({'site': mySite.nickname, "data": statusList});
+          });
+        });
+        stackChartDataList
+            .sort((Map a, Map b) => a['site'].compareTo(b['site']));
+        // Logger.instance.w(stackChartDataList[0]);
+      }
+    });
     getSiteStatusList().then((value) {
       if (value.code == 0) {
         setState(() {
+          uploaded = 0;
+          downloaded = 0;
+          seedVol = 0;
           statusList = value.data;
           statusList.sort((SiteStatus a, SiteStatus b) =>
               b.statusUploaded!.compareTo(a.statusUploaded!));
           // statusList.shuffle();
-
+          pieDataList = statusList
+              .map((SiteStatus e) => {
+                    'genre': e.mySiteNickname,
+                    'sold': e.statusUploaded,
+                  })
+              .toList();
+          // Logger.instance.w(pieDataList);
           for (var element in statusList) {
             uploaded += element.statusUploaded!;
             downloaded += element.statusDownloaded!;
             seedVol += element.statusSeedVolume!;
           }
-          _tooltipBehavior = TooltipBehavior(
-            enable: true,
-            header: '',
-            canShowMarker: false,
-            activationMode: ActivationMode.singleTap,
-            builder: (dynamic data, dynamic point, dynamic series,
-                int pointIndex, int seriesIndex) {
-              return Container(
-                padding: const EdgeInsets.all(1),
-                decoration: BoxDecoration(
-                  color: Colors.teal.shade300,
-                  border: Border.all(width: 2, color: Colors.teal.shade400),
-                ),
-                child: Text(
-                  '${data.mySiteNickname}: ${filesize(data.statusUploaded)}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                ),
-              );
-            },
-          );
         });
       } else {
         Get.snackbar(
@@ -95,84 +114,99 @@ class _DashBoardState extends State<DashBoard>
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: GlassWidget(
-        child: Container(
-          color: Colors.grey.withOpacity(0.5),
-          child: Column(
-            children: [
-              _buildGridView(),
-              Expanded(
-                child: EasyRefresh(
-                  onRefresh: initPieChartData,
-                  child: ListView(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        color: Colors.teal.withOpacity(0.5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.upload,
-                                  color: Colors.green,
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 0.5),
-                                Text(
-                                  '下载量${filesize(uploaded)}',
-                                  style: const TextStyle(
-                                      color: Colors.white70, fontSize: 13),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.download,
-                                  color: Colors.amber,
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 0.5),
-                                Text(
-                                  '下载量${filesize(downloaded)}',
-                                  style: const TextStyle(
-                                      color: Colors.white70, fontSize: 13),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.cloud_upload,
-                                  color: Colors.white70,
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 0.5),
-                                Text(
-                                  '做种量${filesize(seedVol)}',
-                                  style: const TextStyle(
-                                      color: Colors.white70, fontSize: 13),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      _buildSmartLabelPieChart(),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                    ],
-                  ),
+        child: Column(
+          children: [
+            _buildGridView(),
+            Expanded(
+              child: EasyRefresh(
+                onRefresh: initPieChartData,
+                child: ListView(
+                  children: [
+                    _buildSiteInfoBar(),
+                    // const SizedBox(height: 15),
+                    _buildSmartLabelPieChart(),
+                    // const SizedBox(height: 10),
+                    _buildStackedBar(),
+                  ],
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Container _buildSiteInfoBar() {
+    return Container(
+      padding: const EdgeInsets.all(5),
+      color: Colors.teal.withOpacity(0.5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.upload,
+                color: Colors.green,
+                size: 10,
+              ),
+              const SizedBox(width: 1),
+              Text(
+                filesize(uploaded),
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
               ),
             ],
           ),
-        ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.download,
+                color: Colors.amber,
+                size: 14,
+              ),
+              const SizedBox(width: 1),
+              Text(
+                filesize(downloaded),
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.ios_share,
+                color: Colors.white70,
+                size: 14,
+              ),
+              const SizedBox(width: 1),
+              Text(
+                downloaded > 0
+                    ? '${(uploaded / downloaded).roundToDouble()}'
+                    : '♾️',
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.cloud_upload,
+                color: Colors.white70,
+                size: 14,
+              ),
+              const SizedBox(width: 1),
+              Text(
+                filesize(seedVol),
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -185,12 +219,48 @@ class _DashBoardState extends State<DashBoard>
         title: ChartTitle(
             text: '站点上传数据汇总',
             textStyle: const TextStyle(
-              fontSize: 14,
+              fontSize: 11,
               color: Colors.white60,
             )),
         centerX: '47%',
+        centerY: '45%',
+        legend: const Legend(
+            height: "200",
+            isVisible: true,
+            iconWidth: 8,
+            padding: 5,
+            itemPadding: 5,
+            width: '64',
+            isResponsive: true,
+            // offset: Offset(20, 0),
+            textStyle: TextStyle(
+              fontSize: 8,
+              color: Colors.white70,
+            )),
         series: _gettSmartLabelPieSeries(),
-        tooltipBehavior: _tooltipBehavior,
+        tooltipBehavior: TooltipBehavior(
+          enable: true,
+          header: '',
+          canShowMarker: false,
+          activationMode: ActivationMode.singleTap,
+          builder: (dynamic data, dynamic point, dynamic series, int pointIndex,
+              int seriesIndex) {
+            return Container(
+              padding: const EdgeInsets.all(1),
+              decoration: BoxDecoration(
+                color: Colors.teal.shade300,
+                border: Border.all(width: 2, color: Colors.teal.shade400),
+              ),
+              child: Text(
+                '${data.mySiteNickname}: ${filesize(data.statusUploaded)}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white70,
+                ),
+              ),
+            );
+          },
+        ),
         enableMultiSelection: true,
       ),
     );
@@ -210,13 +280,13 @@ class _DashBoardState extends State<DashBoard>
         explode: true,
         explodeIndex: 0,
         explodeOffset: '10%',
-        radius: '80%',
+        radius: '60%',
         dataLabelSettings: const DataLabelSettings(
           margin: EdgeInsets.zero,
           isVisible: true,
           labelPosition: ChartDataLabelPosition.outside,
           textStyle: TextStyle(
-            fontSize: 8.8,
+            fontSize: 8,
             color: Colors.white60,
           ),
           showZeroValue: false,
@@ -232,6 +302,10 @@ class _DashBoardState extends State<DashBoard>
 
   @override
   void dispose() {
+    statusList.clear();
+    uploaded = 0;
+    downloaded = 0;
+    seedVol = 0;
     super.dispose();
   }
 
@@ -310,6 +384,118 @@ class _DashBoardState extends State<DashBoard>
             Widget item = items[index];
             return item;
           }),
+    );
+  }
+
+  Widget _buildStackedBar() {
+    return SizedBox(
+      height: 280,
+      child: SfCartesianChart(
+          title: ChartTitle(
+              text: '每日数据',
+              textStyle: const TextStyle(
+                fontSize: 11,
+                color: Colors.white70,
+              )),
+          isTransposed: true,
+          legend: const Legend(
+              isVisible: false,
+              iconWidth: 8,
+              iconHeight: 8,
+              padding: 5,
+              itemPadding: 5,
+              textStyle: TextStyle(
+                fontSize: 8,
+                color: Colors.white70,
+              )),
+          enableSideBySideSeriesPlacement: false,
+          plotAreaBorderWidth: 0,
+          enableAxisAnimation: true,
+          selectionType: SelectionType.series,
+          tooltipBehavior: TooltipBehavior(
+            enable: true,
+            header: '',
+            canShowMarker: false,
+            activationMode: ActivationMode.singleTap,
+            builder: (dynamic data, dynamic point, dynamic series,
+                int pointIndex, int seriesIndex) {
+              return Container(
+                padding: const EdgeInsets.all(1),
+                decoration: BoxDecoration(
+                  color: Colors.teal.shade300,
+                  border: Border.all(width: 2, color: Colors.teal.shade400),
+                ),
+                child: Text(
+                  '${series.name}: ${filesize(point.y)}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.white70,
+                  ),
+                ),
+              );
+            },
+          ),
+          primaryXAxis: CategoryAxis(
+            majorGridLines: const MajorGridLines(width: 0),
+            axisLabelFormatter: (AxisLabelRenderDetails details) {
+              return ChartAxisLabel(
+                details.text,
+                const TextStyle(fontSize: 10, color: Colors.white70),
+              );
+            },
+          ),
+          primaryYAxis: NumericAxis(
+            axisLine: const AxisLine(width: 0),
+            axisLabelFormatter: (AxisLabelRenderDetails details) {
+              return ChartAxisLabel(
+                ProperFilesize.generateHumanReadableFilesize(details.value),
+                const TextStyle(fontSize: 10, color: Colors.white70),
+              );
+            },
+            majorTickLines: const MajorTickLines(size: 0),
+          ),
+          series: List.generate(stackChartDataList.length, (index) {
+            var siteData = stackChartDataList[index];
+            List<SiteBaseStatus> dataSource = siteData['data'].sublist(0);
+            return StackedBarSeries<SiteBaseStatus, String>(
+              name: siteData['site'],
+              // selectionBehavior: SelectionBehavior(
+              //   enable: true,
+              //     selectionController: RangeController
+              // ),
+              onPointTap: (ChartPointDetails details) {
+                for (CartesianChartPoint e in details.dataPoints!) {
+                  Logger.instance.w(e.x);
+                  Logger.instance.w(e.regionData);
+                }
+              },
+              legendIconType: LegendIconType.circle,
+              dataSource: dataSource,
+              isVisibleInLegend: true,
+              xValueMapper: (SiteBaseStatus status, loop) => loop > 0
+                  ? status.updatedDate!
+                  // .substring(status.updatedDate!.length - 5)
+                  : null,
+              yValueMapper: (SiteBaseStatus status, loop) {
+                // Logger.instance.w(status.uploaded!);
+                // Logger.instance.w(siteData['data'][loop].uploaded);
+                if (loop > 0 && loop < dataSource.length) {
+                  num increase =
+                      status.uploaded! - dataSource[loop - 1].uploaded!;
+                  return increase > 0 ? increase : 0;
+                }
+                return null;
+              },
+              pointColorMapper: (SiteBaseStatus status, _) =>
+                  RandomColor().randomColor(),
+              emptyPointSettings: EmptyPointSettings(
+                mode: EmptyPointMode.drop,
+              ),
+              dataLabelMapper: (SiteBaseStatus status, _) => siteData['site'],
+              // color: RandomColor().randomColor(),
+              enableTooltip: true,
+            );
+          }).toList()),
     );
   }
 }
