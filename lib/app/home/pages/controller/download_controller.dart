@@ -79,8 +79,6 @@ class DownloadController extends GetxController {
       password: downloader.password!,
     );
     TransferInfo res = await qbittorrent.transfer.getGlobalTransferInfo();
-    LoggerHelper.Logger.instance.w(res.connectionStatus);
-
     return CommonResponse(data: res);
   }
 

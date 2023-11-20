@@ -55,7 +55,7 @@ class _DownloadPageState
     //   connectState = res.code == 0;
     // });
     return GFCard(
-      margin: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
+      margin: const EdgeInsets.only(left: 10, right: 10, bottom: 0, top: 5),
       padding: const EdgeInsets.only(left: 0, right: 0, bottom: 10),
       boxFit: BoxFit.cover,
       color: Colors.teal.withOpacity(0.9),
@@ -137,6 +137,7 @@ class _DownloadPageState
   Widget build(BuildContext context) {
     // super.build(context);
     return Scaffold(
+      // extendBody: true,
       backgroundColor: Colors.transparent,
       body: GlassWidget(
         // child: FutureBuilder(
@@ -197,6 +198,7 @@ class _DownloadPageState
           );
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
     );
   }
 
@@ -219,7 +221,7 @@ class _DownloadPageState
             return const GFLoader();
           }
           if (snapshot.connectionState == ConnectionState.done) {
-            LoggerHelper.Logger.instance.w(snapshot.data);
+            // LoggerHelper.Logger.instance.w(snapshot.data);
             if (snapshot.data == null) {
               return const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -240,9 +242,6 @@ class _DownloadPageState
                 ],
               );
             }
-
-            LoggerHelper.Logger.instance.w(snapshot.data.code);
-
             var res = snapshot.data.data;
             if (downloader.category == 'Qb') {
               return Container(

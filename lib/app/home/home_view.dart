@@ -13,9 +13,10 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _globalKey,
+      // extendBody: true,
       backgroundColor: Colors.teal.shade200,
       appBar: GFAppBar(
-        backgroundColor: Colors.teal.withOpacity(0.5),
+        backgroundColor: Colors.teal.withOpacity(0.1),
         elevation: 0.0,
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -166,25 +167,25 @@ class HomeView extends GetView<HomeController> {
       ),
       drawerEdgeDragWidth: 0.0,
       drawerScrimColor: Colors.white.withOpacity(0.6),
-      floatingActionButton: GFIconButton(
-        icon: const Icon(Icons.menu_outlined),
-        color: Colors.teal.shade700,
-        size: 18,
-        onPressed: () {
-          _globalKey.currentState?.openDrawer();
-        },
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
+      // floatingActionButton: GFIconButton(
+      //   icon: const Icon(Icons.menu_outlined),
+      //   color: Colors.teal.shade700,
+      //   size: 18,
+      //   onPressed: () {
+      //     _globalKey.currentState?.openDrawer();
+      //   },
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
       bottomNavigationBar: Obx(() => BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.teal.shade300,
+            backgroundColor: Colors.teal.withOpacity(0.8),
             currentIndex: controller.initPage.value,
             onTap: controller.changePage,
             selectedFontSize: 12,
             unselectedFontSize: 12,
             // backgroundColor: Colors.blueGrey,
             iconSize: 18,
-            selectedItemColor: GFColors.SECONDARY,
+            selectedItemColor: Colors.teal.shade300,
             unselectedItemColor: Colors.grey[150],
             items: controller.menuItems,
           )),
