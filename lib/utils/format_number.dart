@@ -1,4 +1,4 @@
-String formatNumber(double value) {
+String formatNumber(num value) {
   List<String> sizes = ['', 'W', 'E'];
   int i = 0;
   while (value >= 10000 && i < sizes.length - 1) {
