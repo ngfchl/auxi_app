@@ -16,8 +16,7 @@ class LoginController extends GetxController {
   bool isServerEdit = false;
   final box = GetStorage();
   List<String> serverList = [...SPUtil.getStringList('ServerList')];
-  TextEditingController serverController =
-      TextEditingController(text: 'http://127.0.0.1:8080');
+  TextEditingController serverController = TextEditingController(text: '');
 
   TextEditingController usernameController =
       TextEditingController(text: 'admin');
@@ -40,7 +39,6 @@ class LoginController extends GetxController {
       username: usernameController.text,
       password: passwordController.text,
     );
-    print(loginUser);
     try {
       await DioClient()
           .post(Api.LOGIN_URL, formData: loginUser.toJson())
@@ -69,8 +67,6 @@ class LoginController extends GetxController {
   }
 
   void saveServer() {
-    print(serverController.text);
-    print(isServerEdit);
     SPUtil.setString("server", serverController.text);
     // serverController.text = box.read("server");
     isServerEdit = true;

@@ -96,65 +96,6 @@ class LoginView extends GetView<LoginController> {
         : const SizedBox.shrink();
   }
 
-  /// 服务器地址设置
-  Widget _buildServerWidget() {
-    return Row(
-      children: [
-        Expanded(
-          child: controller.isServerEdit
-              ? Text(
-                  controller.serverController.text,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                )
-              : TextField(
-                  controller: controller.serverController,
-                  decoration: const InputDecoration(
-                    hintText: '请输入服务器地址',
-                    hintStyle: TextStyle(color: Colors.white),
-                    border: InputBorder.none,
-                  ),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.cyan,
-                  ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                        RegExp("[A-Z,a-z,0-9,/,:,.]"))
-                  ],
-                ),
-        ),
-        controller.isServerEdit
-            ? GFIconButton(
-                onPressed: controller.editServer,
-                type: GFButtonType.transparent,
-                color: Colors.white,
-                size: 20,
-                icon: const Icon(
-                  Icons.edit,
-                  color: Colors.white,
-                  size: 18,
-                ),
-              )
-            : GFIconButton(
-                onPressed: controller.saveServer,
-                type: GFButtonType.transparent,
-                color: Colors.white,
-                size: 20,
-                icon: const Icon(
-                  Icons.save,
-                  color: Colors.white,
-                  size: 18,
-                ),
-              ),
-      ],
-    );
-  }
-
   List<Widget> _buildUserForm() {
     return [
       Container(
@@ -172,7 +113,7 @@ class LoginView extends GetView<LoginController> {
             border: InputBorder.none,
           ),
           textAlign: TextAlign.center,
-          autofocus: true,
+          autofocus: false,
           style: const TextStyle(
             fontSize: 16,
             color: Colors.white,
@@ -196,6 +137,7 @@ class LoginView extends GetView<LoginController> {
             border: InputBorder.none,
           ),
           obscureText: true,
+          autofocus: false,
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 16,
