@@ -116,17 +116,16 @@ class _DashBoardState extends State<DashBoard>
       body: GlassWidget(
         child: Column(
           children: [
-            _buildGridView(),
             Expanded(
               child: EasyRefresh(
                 onRefresh: initPieChartData,
                 child: ListView(
                   children: [
                     _buildSiteInfoBar(),
-                    // const SizedBox(height: 15),
+                    _buildBackColumnChart(),
                     _buildSmartLabelPieChart(),
-                    // const SizedBox(height: 10),
                     _buildStackedBar(),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -134,6 +133,8 @@ class _DashBoardState extends State<DashBoard>
           ],
         ),
       ),
+      floatingActionButton: _actionButtonList(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
     );
   }
 
@@ -148,9 +149,24 @@ class _DashBoardState extends State<DashBoard>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(
+                Icons.language,
+                color: Colors.blue,
+                size: 12,
+              ),
+              const SizedBox(width: 1),
+              Text(
+                '站点数：${statusList.length}',
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
                 Icons.upload,
-                color: Colors.green,
-                size: 10,
+                color: Colors.red,
+                size: 12,
               ),
               const SizedBox(width: 1),
               Text(
@@ -165,7 +181,7 @@ class _DashBoardState extends State<DashBoard>
               const Icon(
                 Icons.download,
                 color: Colors.amber,
-                size: 14,
+                size: 12,
               ),
               const SizedBox(width: 1),
               Text(
@@ -178,9 +194,9 @@ class _DashBoardState extends State<DashBoard>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(
-                Icons.ios_share,
+                Icons.share,
                 color: Colors.white70,
-                size: 14,
+                size: 12,
               ),
               const SizedBox(width: 1),
               Text(
@@ -197,7 +213,7 @@ class _DashBoardState extends State<DashBoard>
               const Icon(
                 Icons.cloud_upload,
                 color: Colors.white70,
-                size: 14,
+                size: 12,
               ),
               const SizedBox(width: 1),
               Text(
@@ -213,8 +229,9 @@ class _DashBoardState extends State<DashBoard>
 
   /// Returns the circular charts with pie series.
   Widget _buildSmartLabelPieChart() {
-    return SizedBox(
+    return Container(
       height: 280,
+      padding: const EdgeInsets.only(left: 10),
       child: SfCircularChart(
         title: ChartTitle(
             text: '站点上传数据汇总',
@@ -224,15 +241,56 @@ class _DashBoardState extends State<DashBoard>
             )),
         centerX: '47%',
         centerY: '45%',
+        margin: const EdgeInsets.all(10),
         legend: const Legend(
-            height: "200",
+            position: LegendPosition.left,
+            // height: "20",
             isVisible: true,
             iconWidth: 8,
             padding: 5,
             itemPadding: 5,
-            width: '64',
+            // width: '64',
             isResponsive: true,
             // offset: Offset(20, 0),
+            // legendItemBuilder:
+            //     (String name, dynamic series, dynamic point, int index) {
+            //   Logger.instance.w(name);
+            //   Logger.instance.w(series.series.dataSource);
+            //   Logger.instance.w(point.y);
+            //   // Logger.instance.w(index);
+            //   SiteStatus status = series.series.dataSource[index];
+            //   return Container(
+            //     height: 15,
+            //     width: 50,
+            //     padding: EdgeInsets.zero,
+            //     child: Row(
+            //       children: [
+            //         // const Icon(
+            //         //   Icons.ac_unit_outlined,
+            //         //   size: 12,
+            //         //   color: Colors.white70,
+            //         // ),
+            //         GFImageOverlay(
+            //           height: 10,
+            //           width: 10,
+            //           image:
+            //               NetworkImage('${status.siteUrl}${status.siteLogo}'),
+            //         ),
+            //         EllipsisText(
+            //           text: name,
+            //           maxWidth: 38,
+            //           style: const TextStyle(
+            //             fontSize: 8,
+            //             color: Colors.white70,
+            //           ),
+            //           isShowMore: false,
+            //           ellipsis: '..',
+            //           maxLines: 1,
+            //         ),
+            //       ],
+            //     ),
+            //   );
+            // },
             textStyle: TextStyle(
               fontSize: 8,
               color: Colors.white70,
@@ -280,7 +338,8 @@ class _DashBoardState extends State<DashBoard>
         explode: true,
         explodeIndex: 0,
         explodeOffset: '10%',
-        radius: '60%',
+        radius: '65%',
+        pointRenderMode: PointRenderMode.gradient,
         dataLabelSettings: const DataLabelSettings(
           margin: EdgeInsets.zero,
           isVisible: true,
@@ -309,81 +368,88 @@ class _DashBoardState extends State<DashBoard>
     super.dispose();
   }
 
-  Widget _buildGridView() {
-    final items = [
-      GFButton(
-        text: '一键签到',
-        size: GFSize.SMALL,
-        color: GFColors.WARNING,
-        onPressed: () {
-          signInAll().then((res) {
-            Get.back();
-            if (res.code == 0) {
-              Get.snackbar(
-                '签到任务',
-                '签到任务信息：${res.msg}',
-                colorText: Colors.white70,
-                backgroundColor: Colors.teal.withOpacity(0.7),
-              );
-            } else {
-              Get.snackbar(
-                '签到失败',
-                '签到任务执行出错啦：${res.msg}',
-                colorText: Colors.red,
-                backgroundColor: Colors.teal.withOpacity(0.7),
-              );
-            }
-          });
-        },
-      ),
-      GFButton(
-        color: GFColors.WARNING,
-        text: '刷新数据',
-        size: GFSize.SMALL,
-        onPressed: () {
-          getNewestStatusAll().then((res) {
-            Get.back();
-            if (res.code == 0) {
-              Get.snackbar(
-                '刷新数据',
-                '刷新数据任务信息：${res.msg}',
-                colorText: Colors.white70,
-                backgroundColor: Colors.teal.withOpacity(0.7),
-              );
-            } else {
-              Get.snackbar(
-                '刷新数据',
-                '刷新数据执行出错啦：${res.msg}',
-                colorText: Colors.red,
-                backgroundColor: Colors.teal.withOpacity(0.7),
-              );
-            }
-          });
-        },
-      ),
-      // GFButton(
-      //   color: GFColors.WARNING,
-      //   onPressed: () {
-      //     Get.snackbar("提示", '开发中');
-      //   },
-      //   text: '一键辅种',
-      // ),
-    ];
-    return Container(
-      padding: const EdgeInsets.all(8),
-      child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 5,
-              crossAxisSpacing: 5,
-              mainAxisSpacing: 5,
-              childAspectRatio: 1),
-          padding: const EdgeInsets.all(8),
-          itemCount: items.length,
-          shrinkWrap: true,
-          itemBuilder: (BuildContext context, int index) {
-            Widget item = items[index];
-            return item;
-          }),
+  Widget _actionButtonList() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        SizedBox(
+          width: 72,
+          child: GFButton(
+            icon: const Icon(
+              Icons.edit_calendar,
+              color: Colors.white,
+              size: 13,
+            ),
+            text: '签到',
+            textColor: Colors.white70,
+            size: GFSize.SMALL,
+            color: Colors.teal.withOpacity(0.7),
+            // type: GFButtonType.transparent,
+            onPressed: () {
+              signInAll().then((res) {
+                Get.back();
+                if (res.code == 0) {
+                  Get.snackbar(
+                    '签到任务',
+                    '签到任务信息：${res.msg}',
+                    colorText: Colors.white70,
+                    backgroundColor: Colors.teal.withOpacity(0.7),
+                  );
+                } else {
+                  Get.snackbar(
+                    '签到失败',
+                    '签到任务执行出错啦：${res.msg}',
+                    colorText: Colors.red,
+                    backgroundColor: Colors.teal.withOpacity(0.7),
+                  );
+                }
+              });
+            },
+          ),
+        ),
+        SizedBox(
+          width: 72,
+          child: GFButton(
+            color: Colors.teal.withOpacity(0.7),
+            text: '刷新',
+            textColor: Colors.white70,
+            size: GFSize.SMALL,
+            // type: GFButtonType.transparent,
+            icon: const Icon(
+              Icons.refresh,
+              size: 12,
+              color: Colors.white70,
+            ),
+            onPressed: () {
+              getNewestStatusAll().then((res) {
+                Get.back();
+                if (res.code == 0) {
+                  Get.snackbar(
+                    '刷新数据',
+                    '刷新数据任务信息：${res.msg}',
+                    colorText: Colors.white70,
+                    backgroundColor: Colors.teal.withOpacity(0.7),
+                  );
+                } else {
+                  Get.snackbar(
+                    '刷新数据',
+                    '刷新数据执行出错啦：${res.msg}',
+                    colorText: Colors.red,
+                    backgroundColor: Colors.teal.withOpacity(0.7),
+                  );
+                }
+              });
+            },
+          ),
+        ),
+        // GFButton(
+        //   color: GFColors.WARNING,
+        //   onPressed: () {
+        //     Get.snackbar("提示", '开发中');
+        //   },
+        //   text: '一键辅种',
+        // ),
+      ],
     );
   }
 
@@ -398,6 +464,7 @@ class _DashBoardState extends State<DashBoard>
                 color: Colors.white70,
               )),
           isTransposed: true,
+          margin: const EdgeInsets.all(15),
           legend: const Legend(
               isVisible: false,
               iconWidth: 8,
@@ -469,6 +536,7 @@ class _DashBoardState extends State<DashBoard>
                   Logger.instance.w(e.regionData);
                 }
               },
+              borderRadius: BorderRadius.circular(5),
               legendIconType: LegendIconType.circle,
               dataSource: dataSource,
               isVisibleInLegend: true,
@@ -497,5 +565,197 @@ class _DashBoardState extends State<DashBoard>
             );
           }).toList()),
     );
+  }
+
+  Widget _buildBackColumnChart() {
+    late ZoomPanBehavior zoomPan = ZoomPanBehavior(
+      enableDoubleTapZooming: true,
+      enablePanning: true,
+      enablePinching: true,
+      enableSelectionZooming: true,
+      enableMouseWheelZooming: true,
+      zoomMode: ZoomMode.y,
+      // maximumZoomLevel: 100,
+      selectionRectBorderWidth: 3,
+    );
+    return SizedBox(
+      height: 350,
+      child: SfCartesianChart(
+        plotAreaBorderWidth: 0,
+        isTransposed: true,
+        enableSideBySideSeriesPlacement: false,
+        title: ChartTitle(
+            text: '数据汇总',
+            textStyle: const TextStyle(
+              fontSize: 11,
+              color: Colors.white60,
+            )),
+        margin: const EdgeInsets.only(right: 40, left: 15, top: 5),
+        tooltipBehavior: TooltipBehavior(
+          enable: true,
+          header: '',
+          canShowMarker: false,
+          activationMode: ActivationMode.singleTap,
+          builder: (dynamic data, dynamic point, dynamic series, int pointIndex,
+              int seriesIndex) {
+            return Container(
+              padding: const EdgeInsets.all(5),
+              width: 120,
+              height: 78,
+              decoration: BoxDecoration(
+                color: Colors.blueGrey,
+                border: Border.all(width: 2, color: Colors.teal.shade400),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.language,
+                          color: Colors.white70,
+                          size: 12,
+                        ),
+                        Text(
+                          '${data.mySiteNickname}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.upload,
+                          color: Colors.green,
+                          size: 12,
+                        ),
+                        Text(
+                          filesize(data.statusUploaded),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.download,
+                          color: Colors.deepOrange,
+                          size: 12,
+                        ),
+                        Text(
+                          filesize(data.statusDownloaded),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        zoomPanBehavior: zoomPan,
+        primaryXAxis: CategoryAxis(
+          rangePadding: ChartRangePadding.round,
+          majorGridLines: const MajorGridLines(width: 0),
+          isInversed: true,
+          autoScrollingMode: AutoScrollingMode.end,
+          labelStyle: const TextStyle(fontSize: 10, color: Colors.white70),
+          labelPosition: ChartDataLabelPosition.inside,
+          tickPosition: TickPosition.inside,
+          placeLabelsNearAxisLine: true,
+        ),
+        primaryYAxis: NumericAxis(
+          axisLine: const AxisLine(width: 1),
+          zoomFactor: 0.9,
+          zoomPosition: 1,
+          visibleMinimum: 2.0,
+          majorTickLines: const MajorTickLines(size: 0),
+          majorGridLines: const MajorGridLines(width: 0.5),
+          rangePadding: ChartRangePadding.additional,
+          axisLabelFormatter: (AxisLabelRenderDetails details) {
+            return ChartAxisLabel(
+              ProperFilesize.generateHumanReadableFilesize(details.value),
+              const TextStyle(fontSize: 10, color: Colors.white70),
+            );
+          },
+        ),
+        series: _getBackToBackColumn(),
+      ),
+    );
+  }
+
+  List<ColumnSeries<SiteStatus, String>> _getBackToBackColumn() {
+    // List<SiteStatus> dataSource = statusList.sublist(0);
+    // dataSource.sort((SiteStatus b, SiteStatus a) =>
+    //     b.statusUploaded!.compareTo(a.statusUploaded!));
+    return <ColumnSeries<SiteStatus, String>>[
+      ColumnSeries<SiteStatus, String>(
+        dataSource: statusList,
+        width: 0.7,
+        xValueMapper: (SiteStatus status, _) => status.mySiteNickname,
+        yValueMapper: (SiteStatus status, _) => status.statusUploaded,
+        dataLabelMapper: (SiteStatus status, _) =>
+            '${status.mySiteNickname!}: ⬆ ${filesize(status.statusUploaded)} ⬇ ${filesize(status.statusDownloaded)}',
+        name: '上传',
+        borderRadius: BorderRadius.circular(5),
+        dataLabelSettings: const DataLabelSettings(
+          margin: EdgeInsets.zero,
+          isVisible: false,
+          labelPosition: ChartDataLabelPosition.outside,
+          textStyle: TextStyle(
+            fontSize: 8,
+            color: Colors.white60,
+          ),
+          showZeroValue: false,
+          connectorLineSettings: ConnectorLineSettings(
+            type: ConnectorType.curve,
+            length: '20%',
+          ),
+          labelIntersectAction: LabelIntersectAction.shift,
+        ),
+      ),
+      ColumnSeries<SiteStatus, String>(
+        dataSource: statusList,
+        width: 0.5,
+        xValueMapper: (SiteStatus status, _) => status.mySiteNickname,
+        yValueMapper: (SiteStatus status, _) => status.statusDownloaded,
+        // dataLabelMapper: (SiteStatus status, _) =>
+        //     '${status.mySiteNickname!}:下载 ${filesize(status.statusDownloaded)}',
+        name: '下载',
+        borderRadius: BorderRadius.circular(5),
+        dataLabelSettings: const DataLabelSettings(
+          margin: EdgeInsets.zero,
+          isVisible: false,
+          labelPosition: ChartDataLabelPosition.outside,
+          textStyle: TextStyle(
+            fontSize: 8,
+            color: Colors.white60,
+          ),
+          showZeroValue: false,
+          connectorLineSettings: ConnectorLineSettings(
+            type: ConnectorType.curve,
+            length: '20%',
+          ),
+          labelIntersectAction: LabelIntersectAction.shift,
+        ),
+      ),
+    ];
   }
 }
