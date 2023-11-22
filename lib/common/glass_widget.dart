@@ -15,9 +15,9 @@ class GlassWidget extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         Lottie.asset(
-          StringUtils.getLottieByName('8isjhu0WtD'),
+          StringUtils.getLottieByName('rJoSLquA8J'),
           repeat: true,
-          fit: BoxFit.cover,
+          fit: BoxFit.fill,
         ),
         // GlassmorphicContainer(
         //   width: double.infinity,
@@ -52,8 +52,8 @@ class GlassWidget extends StatelessWidget {
         GlassContainer(
           height: double.infinity,
           width: double.infinity,
-          blur: 4,
-          color: Colors.white.withOpacity(0.9999),
+          blur: 1,
+          color: Colors.white.withOpacity(0.9999999),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
