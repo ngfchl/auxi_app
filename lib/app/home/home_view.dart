@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 
+import '../../utils/storage.dart';
 import '../routes/app_pages.dart';
 import 'home_controller.dart';
 
@@ -13,11 +14,11 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _globalKey,
-      // extendBody: true,
-      backgroundColor: Colors.teal.shade200,
+      extendBody: true,
+      backgroundColor: Colors.teal.shade300,
       appBar: GFAppBar(
-        backgroundColor: Colors.teal.withOpacity(0.1),
-        elevation: 0.0,
+        backgroundColor: Colors.transparent,
+        // elevation: 0.0,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -31,6 +32,7 @@ class HomeView extends GetView<HomeController> {
             ),
           ),
         ),
+
         actions: <Widget>[
           GFIconButton(
             icon: const Icon(
@@ -54,7 +56,7 @@ class HomeView extends GetView<HomeController> {
       ),
       drawer: GFDrawer(
         elevation: 10,
-        color: Colors.teal.withOpacity(0.6),
+        color: Colors.teal.shade600,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -95,6 +97,11 @@ class HomeView extends GetView<HomeController> {
                       ),
                     ),
                     // Text('admin@admin.com'),
+                    Text(
+                      '当前服务器：${SPUtil.getString('server')}',
+                      style:
+                          const TextStyle(fontSize: 12, color: Colors.white70),
+                    ),
                   ],
                 ),
               ),
@@ -178,7 +185,10 @@ class HomeView extends GetView<HomeController> {
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
       bottomNavigationBar: Obx(() => BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.teal.withOpacity(0.8),
+            backgroundColor: Colors.teal.shade500.withOpacity(0.85),
+            elevation: 0,
+            // showSelectedLabels: false,
+            // showUnselectedLabels: false,
             currentIndex: controller.initPage.value,
             onTap: controller.changePage,
             selectedFontSize: 12,
