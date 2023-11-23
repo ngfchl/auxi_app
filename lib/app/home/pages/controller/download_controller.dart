@@ -13,27 +13,91 @@ import '../../../../utils/logger_helper.dart' as LoggerHelper;
 
 class DownloadController extends GetxController {
   bool isLoaded = false;
-  List<Downloader> dataList = [];
+  RxList<Downloader> dataList = <Downloader>[].obs;
+  RxBool isTimerActive = true.obs; // 使用 RxBool 控制定时器是否激活
+
+  late Timer periodicTimer;
+  late Timer fiveMinutesTimer;
+
+  // 使用StreamController来管理下载状态的流
+  final StreamController<List<Downloader>> _downloadStreamController =
+      StreamController<List<Downloader>>.broadcast();
+
+  // 提供获取下载状态流的方法
+  Stream<List<Downloader>> get downloadStream =>
+      _downloadStreamController.stream;
+
   Map<int, dynamic> speedInfo = {};
 
   @override
   void onInit() {
     getDownloaderListFromServer();
 
+    // 设置定时器，每隔一定时间刷新下载器数据
+    startPeriodicTimer();
+    // 设置一个5分钟后执行的定时器
+    fiveMinutesTimer = Timer(const Duration(minutes: 5), () {
+      // 定时器触发后执行的操作，这里可以取消periodicTimer、关闭资源等
+      periodicTimer.cancel();
+      // 你可以在这里添加其他需要在定时器触发后执行的逻辑
+    });
+    LoggerHelper.Logger.instance.w(periodicTimer);
+
     super.onInit();
+  }
+
+  void startPeriodicTimer() {
+    // 设置定时器，每隔一定时间刷新下载器数据
+    periodicTimer = Timer.periodic(const Duration(seconds: 5), (Timer t) {
+      // 在定时器触发时获取最新的下载器数据
+      refreshDownloadStatus();
+    });
+    isTimerActive.value = true;
+    update();
+  }
+
+  // 取消定时器
+  void cancelPeriodicTimer() {
+    if (periodicTimer.isActive) {
+      periodicTimer.cancel();
+    }
+    isTimerActive.value = false;
+    update();
+  }
+
+  Future<void> refreshDownloadStatus() async {
+    // 遍历下载列表，使用每个下载项的账户密码信息获取最新的下载器状态
+    for (Downloader item in dataList) {
+      try {
+        dynamic status = await getIntervalSpeed(item);
+        // 更新下载项的状态
+        item.status.add(status.data);
+        _downloadStreamController.sink.add([item]);
+        update();
+      } catch (e) {
+        // 处理获取状态时的错误
+        print('Error fetching download status: $e');
+      }
+    }
+    // 发送最新的下载列表到流中
+    // _downloadStreamController.add(dataList.toList());
   }
 
   getDownloaderListFromServer() {
     getDownloaderList().then((value) {
       if (value.code == 0) {
-        dataList = value.data;
+        dataList.value = value.data;
         isLoaded = true;
+        _downloadStreamController.add(dataList.toList());
       } else {
         Get.snackbar('', value.msg.toString());
       }
     }).catchError((e) {
       Get.snackbar('', e.toString());
     });
+    // 发送最新的下载列表到流中
+    refreshDownloadStatus();
+
     update();
   }
 
@@ -99,9 +163,16 @@ class DownloadController extends GetxController {
     );
   }
 
-  dynamic getIntervalSpeed(Downloader downloader, {int duration = 5}) {
+  dynamic getIntervalSpeed(Downloader downloader) {
     return downloader.category == 'Qb'
         ? getQbSpeed(downloader)
         : getTrSpeed(downloader);
+  }
+
+  @override
+  void onClose() {
+    // 关闭StreamController以避免内存泄漏
+    _downloadStreamController.close();
+    super.onClose();
   }
 }
