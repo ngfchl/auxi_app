@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ellipsis_text/flutter_ellipsis_text.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
-import 'package:proper_filesize/proper_filesize.dart';
 import 'package:qbittorrent_api/qbittorrent_api.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -21,16 +20,15 @@ class DownloadPage extends StatefulWidget {
   State<DownloadPage> createState() => _DownloadPageState();
 }
 
-class _DownloadPageState
-    extends State<DownloadPage> // with AutomaticKeepAliveClientMixin
-{
+class _DownloadPageState extends State<DownloadPage>
+    with AutomaticKeepAliveClientMixin {
   bool isLoaded = false;
 
   // List<Downloader> dataList = [];
   DownloadController controller = Get.put(DownloadController());
 
-  // @override
-  // bool get wantKeepAlive => true;
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -53,6 +51,7 @@ class _DownloadPageState
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // 必须调用 super.build
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: GetBuilder<DownloadController>(builder: (controller) {
@@ -163,6 +162,7 @@ class _DownloadPageState
                       plotAreaBorderWidth: 0,
                       tooltipBehavior: TooltipBehavior(
                         enable: true,
+                        shared: true,
                         decimalPlaces: 1,
                         builder: (dynamic data, dynamic point, dynamic series,
                             int pointIndex, int seriesIndex) {
@@ -194,8 +194,7 @@ class _DownloadPageState
                           axisLine: const AxisLine(width: 0),
                           axisLabelFormatter: (AxisLabelRenderDetails details) {
                             return ChartAxisLabel(
-                              ProperFilesize.generateHumanReadableFilesize(
-                                  details.value),
+                              filesize(details.value),
                               const TextStyle(
                                   fontSize: 10, color: Colors.white70),
                             );
@@ -281,8 +280,7 @@ class _DownloadPageState
                           axisLine: const AxisLine(width: 0),
                           axisLabelFormatter: (AxisLabelRenderDetails details) {
                             return ChartAxisLabel(
-                              ProperFilesize.generateHumanReadableFilesize(
-                                  details.value),
+                              filesize(details.value),
                               const TextStyle(
                                   fontSize: 10, color: Colors.white70),
                             );
@@ -390,7 +388,7 @@ class _DownloadPageState
         icon: GFIconButton(
           icon: connectState
               ? const Icon(
-                  Icons.flash_on,
+                  Icons.bolt,
                   color: Colors.white70,
                   size: 24,
                 )
@@ -539,8 +537,7 @@ class _DownloadPageState
         padding: const EdgeInsets.only(left: 20, right: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          // textBaseline: TextBaseline.alphabetic,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
