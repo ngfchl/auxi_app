@@ -569,7 +569,7 @@ class _DashBoardState extends State<DashBoard>
           width: 72,
           child: GFButton(
             color: Colors.teal.withOpacity(0.7),
-            text: '刷新',
+            text: '更新',
             textColor: Colors.white70,
             size: GFSize.SMALL,
             // type: GFButtonType.transparent,
@@ -583,15 +583,15 @@ class _DashBoardState extends State<DashBoard>
                 Get.back();
                 if (res.code == 0) {
                   Get.snackbar(
-                    '刷新数据',
-                    '刷新数据任务信息：${res.msg}',
+                    '更新数据',
+                    '更新数据任务信息：${res.msg}',
                     colorText: Colors.white70,
                     backgroundColor: Colors.teal.withOpacity(0.7),
                   );
                 } else {
                   Get.snackbar(
-                    '刷新数据',
-                    '刷新数据执行出错啦：${res.msg}',
+                    '更新数据',
+                    '更新数据执行出错啦：${res.msg}',
                     colorText: Colors.red,
                     backgroundColor: Colors.teal.withOpacity(0.7),
                   );
@@ -607,6 +607,7 @@ class _DashBoardState extends State<DashBoard>
         //   },
         //   text: '一键辅种',
         // ),
+        const SizedBox(height: 72)
       ],
     );
   }
