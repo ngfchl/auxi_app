@@ -34,18 +34,24 @@ class TaskPage extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: GFIconButton(
-        icon: const Icon(Icons.add),
-        shape: GFIconButtonShape.standard,
-        color: GFColors.PRIMARY.withOpacity(0.6),
-        onPressed: () {
-          GFToast.showToast(
-            '添加任务',
-            context,
-            backgroundColor: GFColors.PRIMARY,
-            toastBorderRadius: 5.0,
-          );
-        },
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          GFIconButton(
+            icon: const Icon(Icons.add),
+            shape: GFIconButtonShape.standard,
+            color: GFColors.PRIMARY.withOpacity(0.6),
+            onPressed: () {
+              GFToast.showToast(
+                '添加任务',
+                context,
+                backgroundColor: GFColors.PRIMARY,
+                toastBorderRadius: 5.0,
+              );
+            },
+          ),
+          const SizedBox(height: 72)
+        ],
       ),
     );
   }

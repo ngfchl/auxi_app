@@ -20,6 +20,7 @@ class SettingPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Text('当前服务器：${SPUtil.getString('server')}'),
             GFButton(
               onPressed: () {
                 TextEditingController configController =

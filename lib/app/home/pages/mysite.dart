@@ -75,18 +75,24 @@ class _MySitePageState extends State<MySitePage>
                 type: GFLoaderType.circle,
               ),
       ),
-      floatingActionButton: GFIconButton(
-        icon: const Icon(Icons.add),
-        shape: GFIconButtonShape.standard,
-        color: GFColors.PRIMARY.withOpacity(0.6),
-        onPressed: () {
-          GFToast.showToast(
-            '添加站点',
-            context,
-            backgroundColor: GFColors.SECONDARY,
-            toastBorderRadius: 5.0,
-          );
-        },
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          GFIconButton(
+            icon: const Icon(Icons.add),
+            shape: GFIconButtonShape.standard,
+            color: GFColors.PRIMARY.withOpacity(0.6),
+            onPressed: () {
+              GFToast.showToast(
+                '添加站点',
+                context,
+                backgroundColor: GFColors.SECONDARY,
+                toastBorderRadius: 5.0,
+              );
+            },
+          ),
+          const SizedBox(height: 72)
+        ],
       ),
     );
   }
