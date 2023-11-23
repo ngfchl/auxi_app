@@ -16,6 +16,7 @@ class Downloader {
   int? packageSize;
   double? packagePercent;
   int? reservedSpace;
+  List<dynamic> status;
 
   Downloader({
     required this.id,
@@ -35,6 +36,7 @@ class Downloader {
     this.packageSize,
     this.packagePercent,
     this.reservedSpace,
+    required this.status,
   });
 
   factory Downloader.fromJson(Map<String, dynamic> json) {
@@ -56,6 +58,7 @@ class Downloader {
       packageSize: json['package_size'],
       packagePercent: json['package_percent'],
       reservedSpace: json['reserved_space'],
+      status: [],
     );
   }
 
