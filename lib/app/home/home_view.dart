@@ -48,6 +48,7 @@ class HomeView extends GetView<HomeController> {
       ),
       body: PageView(
         controller: controller.pageController,
+        physics: const NeverScrollableScrollPhysics(),
         onPageChanged: (index) {
           controller.initPage.value = index;
           controller.update();
