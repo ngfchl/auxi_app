@@ -7,6 +7,8 @@ import '../login/login_binding.dart';
 import '../login/login_view.dart';
 import '../search/search_binding.dart';
 import '../search/search_view.dart';
+import '../torrent/torrent_binding.dart';
+import '../torrent/torrent_view.dart';
 
 // ignore_for_file: constant_identifier_names
 
@@ -38,6 +40,11 @@ class AppPages {
       middlewares: [
         LoginMiddleware(),
       ],
+    ),
+    GetPage(
+      name: _Paths.TORRENT,
+      page: () => const TorrentView(),
+      binding: TorrentBinding(),
     ),
   ];
 }
