@@ -40,6 +40,7 @@ dependencies:
   syncfusion_flutter_charts: ^23.1.44
   random_color: ^1.0.6-nullsafety
   syncfusion_flutter_gauges: ^23.2.4
+  intl: ^0.18.1
 
 
 dev_dependencies:
