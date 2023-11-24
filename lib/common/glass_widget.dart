@@ -21,17 +21,17 @@ class GlassWidget extends StatelessWidget {
           height: double.infinity,
           width: double.infinity,
           blur: 1,
-          color: Colors.white.withOpacity(0.9999999),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.green.withOpacity(0.5),
-              Colors.blueGrey.withOpacity(0.6),
-              Colors.grey.withOpacity(0.4),
-              Colors.blue.withOpacity(0.6),
-            ],
-          ),
+          color: Colors.white54,
+          // gradient: LinearGradient(
+          //   begin: Alignment.topLeft,
+          //   end: Alignment.bottomRight,
+          //   colors: [
+          //     Colors.green.withOpacity(0.5),
+          //     Colors.blueGrey.withOpacity(0.6),
+          //     Colors.grey.withOpacity(0.4),
+          //     Colors.blue.withOpacity(0.6),
+          //   ],
+          // ),
           //--code to remove border
           border: const Border.fromBorderSide(BorderSide.none),
           shadowStrength: 5,
