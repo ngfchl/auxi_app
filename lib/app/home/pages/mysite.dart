@@ -275,7 +275,7 @@ class _MySitePageState extends State<MySitePage>
       margin: const EdgeInsets.all(5),
       padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8, top: 0),
       boxFit: BoxFit.cover,
-      color: Colors.grey.withOpacity(0.5),
+      color: Colors.white54,
       // image: Image.asset('your asset image'),
       title: GFListTile(
         padding: EdgeInsets.zero,
@@ -283,7 +283,7 @@ class _MySitePageState extends State<MySitePage>
           backgroundImage:
               NetworkImage(siteStatus.siteLogo as String, headers: {}),
           shape: GFAvatarShape.square,
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.white54,
           size: 20,
         ),
         title: Row(
@@ -292,7 +292,7 @@ class _MySitePageState extends State<MySitePage>
             Text(
               '${siteStatus.mySiteNickname ?? siteStatus.siteName}',
               style: const TextStyle(
-                color: Colors.white70,
+                color: Colors.black38,
                 fontSize: 13,
               ),
             ),
@@ -317,16 +317,18 @@ class _MySitePageState extends State<MySitePage>
                   type: GFButtonType.transparent,
                   icon: const Icon(
                     Icons.mail_outline,
-                    color: Colors.white70,
+                    color: Colors.black38,
                   ),
                 ),
               ),
             if (siteStatus.statusMyLevel != null &&
                 siteStatus.statusMyLevel!.trim().isNotEmpty)
               GFButton(
-                color: Colors.transparent,
+                // color: Colors.transparent,
                 // color: Colors.transparent,
                 text: '${siteStatus.statusMyLevel}',
+                textStyle: const TextStyle(fontSize: 13, color: Colors.black38),
+                type: GFButtonType.transparent,
                 // shape: GFButtonShape.pills,
                 size: 20,
                 onPressed: () {
@@ -348,7 +350,7 @@ class _MySitePageState extends State<MySitePage>
                           mainActionBackgroundColor: Colors.teal.shade600,
                           backgroundColor: Colors.teal.shade600,
                           mainActionTextStyle: BrnTextStyle(
-                            color: Colors.white70,
+                            color: Colors.black38,
                           ),
                         ),
                         contentWidget: GFCard(
@@ -379,7 +381,7 @@ class _MySitePageState extends State<MySitePage>
                                 titleTextStyle: BrnTextStyle(
                                     color: Colors.white, fontSize: 20),
                                 descTextStyle: BrnTextStyle(
-                                    color: Colors.white70, fontSize: 12)),
+                                    color: Colors.black38, fontSize: 12)),
                           ),
                         ),
                         actionsText: const [
@@ -389,9 +391,6 @@ class _MySitePageState extends State<MySitePage>
                     },
                   );
                 },
-                textStyle: const TextStyle(
-                  color: Colors.white60,
-                ),
               ),
           ],
         ),
@@ -402,7 +401,7 @@ class _MySitePageState extends State<MySitePage>
               Text(
                 calcWeeksDays(siteStatus.mySiteJoined!),
                 style: const TextStyle(
-                  color: Colors.white70,
+                  color: Colors.black38,
                   fontSize: 10,
                 ),
               ),
@@ -413,7 +412,7 @@ class _MySitePageState extends State<MySitePage>
                   const Icon(
                     Icons.insert_invitation,
                     size: 12,
-                    color: Colors.white70,
+                    color: Colors.black38,
                   ),
                   const SizedBox(
                     width: 2,
@@ -421,7 +420,7 @@ class _MySitePageState extends State<MySitePage>
                   Text(
                     '${siteStatus.statusInvitation}',
                     style: const TextStyle(
-                      color: Colors.white70,
+                      color: Colors.black38,
                       fontSize: 13,
                     ),
                   ),
@@ -451,7 +450,7 @@ class _MySitePageState extends State<MySitePage>
                         '${filesize(siteStatus.statusUploaded)} (${siteStatus.statusSeed})',
                         style: const TextStyle(
                           fontSize: 12,
-                          color: Colors.white70,
+                          color: Colors.black38,
                         ),
                       ),
                     ],
@@ -469,7 +468,7 @@ class _MySitePageState extends State<MySitePage>
                         '${filesize(siteStatus.statusDownloaded)} (${siteStatus.statusLeech})',
                         style: const TextStyle(
                           fontSize: 12,
-                          color: Colors.white70,
+                          color: Colors.black38,
                         ),
                       ),
                     ],
@@ -485,7 +484,7 @@ class _MySitePageState extends State<MySitePage>
                         Icon(
                           Icons.ios_share,
                           color: siteStatus.statusRatio! > 1
-                              ? Colors.white70
+                              ? Colors.black38
                               : Colors.deepOrange,
                           size: 14,
                         ),
@@ -494,7 +493,7 @@ class _MySitePageState extends State<MySitePage>
                           formatNumber(siteStatus.statusRatio!),
                           style: const TextStyle(
                             fontSize: 12,
-                            color: Colors.white70,
+                            color: Colors.black38,
                           ),
                         ),
                       ],
@@ -505,7 +504,7 @@ class _MySitePageState extends State<MySitePage>
                       children: [
                         const Icon(
                           Icons.cloud_upload_outlined,
-                          color: Colors.white70,
+                          color: Colors.black38,
                           size: 14,
                         ),
                         const SizedBox(width: 2),
@@ -513,7 +512,7 @@ class _MySitePageState extends State<MySitePage>
                           filesize(siteStatus.statusSeedVolume),
                           style: const TextStyle(
                             fontSize: 12,
-                            color: Colors.white70,
+                            color: Colors.black38,
                           ),
                         ),
                       ],
@@ -529,7 +528,7 @@ class _MySitePageState extends State<MySitePage>
                       children: [
                         const Icon(
                           Icons.timer_outlined,
-                          color: Colors.white70,
+                          color: Colors.black38,
                           size: 14,
                         ),
                         const SizedBox(width: 2),
@@ -537,7 +536,7 @@ class _MySitePageState extends State<MySitePage>
                           '${formatNumber(siteStatus.statusBonusHour!)}(${siteStatus.statusBonusHour != null && siteStatus.siteSpFull != null && siteStatus.siteSpFull! > 0 ? ((siteStatus.statusBonusHour! / siteStatus.siteSpFull!) * 100).toStringAsFixed(2) : '0'}%)',
                           style: const TextStyle(
                             fontSize: 12,
-                            color: Colors.white70,
+                            color: Colors.black38,
                           ),
                         ),
                       ],
@@ -549,7 +548,7 @@ class _MySitePageState extends State<MySitePage>
                       children: [
                         const Icon(
                           Icons.score,
-                          color: Colors.white70,
+                          color: Colors.black38,
                           size: 14,
                         ),
                         const SizedBox(width: 2),
@@ -557,7 +556,7 @@ class _MySitePageState extends State<MySitePage>
                           '${formatNumber(siteStatus.statusMyBonus!)}(${formatNumber(siteStatus.statusMyScore!)})',
                           style: const TextStyle(
                             fontSize: 12,
-                            color: Colors.white70,
+                            color: Colors.black38,
                           ),
                         ),
                       ],
@@ -577,7 +576,7 @@ class _MySitePageState extends State<MySitePage>
                   '最近更新：${siteStatus.statusUpdatedAt?.replaceAll('T', ' ')}',
                   textAlign: TextAlign.right,
                   style: const TextStyle(
-                    color: Colors.white70,
+                    color: Colors.black38,
                     fontSize: 10.5,
                   ),
                 ),
@@ -614,7 +613,7 @@ class _MySitePageState extends State<MySitePage>
                     Get.snackbar(
                       '签到成功',
                       '${siteStatus.mySiteNickname} 签到信息：${res.msg}',
-                      colorText: Colors.white70,
+                      colorText: Colors.black38,
                       backgroundColor: Colors.teal.withOpacity(0.7),
                     );
                   } else {
@@ -648,7 +647,7 @@ class _MySitePageState extends State<MySitePage>
                     Get.snackbar(
                       '站点数据刷新成功',
                       '${siteStatus.mySiteNickname} 数据刷新：${res.msg}',
-                      colorText: Colors.white70,
+                      colorText: Colors.black38,
                       backgroundColor: Colors.teal.withOpacity(0.7),
                     );
                   } else {

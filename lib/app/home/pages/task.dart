@@ -58,6 +58,9 @@ class TaskPage extends StatelessWidget {
 
   editTask(Schedule task) {
     Get.bottomSheet(
+      backgroundColor: Colors.white54,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(3))),
       Padding(
         padding: const EdgeInsets.all(22.0),
         child: SingleChildScrollView(
@@ -66,8 +69,8 @@ class TaskPage extends StatelessWidget {
               const GFTypography(
                 text: '编辑任务',
                 type: GFTypographyType.typo4,
-                textColor: Colors.white70,
-                dividerColor: Colors.white70,
+                textColor: Colors.black38,
+                dividerColor: Colors.black38,
               ),
               Container(
                 padding: const EdgeInsets.all(10),
@@ -80,17 +83,17 @@ class TaskPage extends StatelessWidget {
                   child: GFDropdown(
                     dropdownColor: Colors.teal.withOpacity(0.8),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black38,
                     ),
                     hint: const Text(
                       '请选择任务！',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black38,
                       ),
                     ),
                     icon: const Icon(
                       Icons.task,
-                      color: Colors.white,
+                      color: Colors.black38,
                     ),
                     // elevation: 10,
                     isExpanded: true,
@@ -98,7 +101,7 @@ class TaskPage extends StatelessWidget {
                     // borderRadius: BorderRadius.circular(10),
                     border:
                         const BorderSide(color: Colors.transparent, width: 1),
-                    dropdownButtonColor: Colors.teal.shade300,
+                    dropdownButtonColor: Colors.transparent,
                     value: task.task,
                     onChanged: (newValue) {},
                     items: controller.taskList.values
@@ -131,7 +134,7 @@ class TaskPage extends StatelessWidget {
                       '开启任务',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white,
+                        color: Colors.black38,
                       ),
                     )
                   ],
@@ -148,14 +151,14 @@ class TaskPage extends StatelessWidget {
                   controller: TextEditingController(text: task.name),
                   decoration: const InputDecoration(
                     hintText: '请输入任务名称',
-                    hintStyle: TextStyle(color: Colors.white),
+                    hintStyle: TextStyle(color: Colors.black38),
                     border: InputBorder.none,
                   ),
                   textAlign: TextAlign.left,
                   autofocus: true,
                   style: const TextStyle(
                     fontSize: 16,
-                    color: Colors.white,
+                    color: Colors.black38,
                   ),
                 ),
               ),
@@ -172,14 +175,14 @@ class TaskPage extends StatelessWidget {
                   ),
                   decoration: const InputDecoration(
                     hintText: '运行时间：分钟',
-                    hintStyle: TextStyle(color: Colors.white),
+                    hintStyle: TextStyle(color: Colors.black38),
                     border: InputBorder.none,
                   ),
                   textAlign: TextAlign.left,
                   autofocus: true,
                   style: const TextStyle(
                     fontSize: 16,
-                    color: Colors.white,
+                    color: Colors.black38,
                   ),
                 ),
               ),
@@ -196,14 +199,14 @@ class TaskPage extends StatelessWidget {
                   ),
                   decoration: const InputDecoration(
                     hintText: '运行时间：小时',
-                    hintStyle: TextStyle(color: Colors.white),
+                    hintStyle: TextStyle(color: Colors.black38),
                     border: InputBorder.none,
                   ),
                   textAlign: TextAlign.left,
                   autofocus: true,
                   style: const TextStyle(
                     fontSize: 16,
-                    color: Colors.white,
+                    color: Colors.black38,
                   ),
                 ),
               ),
@@ -224,8 +227,8 @@ class TaskPage extends StatelessWidget {
                   onChange: (leftList, rightList) {
                     // your logic
                   },
-                  listBackgroundColor: Colors.teal.withOpacity(0.6),
-                  textStyle: const TextStyle(color: Colors.white),
+                  listBackgroundColor: Colors.grey.withOpacity(0.6),
+                  textStyle: const TextStyle(color: Colors.black38),
                   tileSplashColor: Colors.white,
                   checkboxFillColor: Colors.transparent,
                 ),
@@ -256,17 +259,15 @@ class TaskPage extends StatelessWidget {
           ),
         ),
       ),
-      backgroundColor: Colors.teal.shade300,
     );
   }
 
   List<Widget> _buildTaskList() {
     return controller.dataList
         .map((item) => GFCard(
-              color: Colors.grey.withOpacity(0.5),
+              color: Colors.white54,
               margin: const EdgeInsets.all(5),
-              padding:
-                  const EdgeInsets.only(left: 0, right: 0, top: 8, bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
               border: Border.all(
                 color: Colors.teal.shade300,
               ),
@@ -280,7 +281,7 @@ class TaskPage extends StatelessWidget {
                       controller.crontabList[item.crontab!]!.express!,
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Colors.white,
+                        color: Colors.white70,
                       ),
                     ),
                   ),
@@ -307,7 +308,7 @@ class TaskPage extends StatelessWidget {
                           Get.snackbar(
                             '执行任务',
                             '${item.name!} 任务ID：${res.msg}',
-                            colorText: Colors.white70,
+                            colorText: Colors.black38,
                             backgroundColor: Colors.teal.withOpacity(0.7),
                           );
                         } else {
@@ -327,14 +328,14 @@ class TaskPage extends StatelessWidget {
                   item.name!,
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.lightGreenAccent,
+                    color: Colors.black38,
                   ),
                 ),
                 subTitle: Text(
                   controller.taskList[item.task!]!.desc!,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.cyan,
+                    color: Colors.black38,
                   ),
                 ),
 
@@ -370,7 +371,7 @@ class TaskPage extends StatelessWidget {
                                 Get.snackbar(
                                   item.enabled! ? '关闭任务' : '开启任务',
                                   '${res.msg}',
-                                  colorText: Colors.white70,
+                                  colorText: Colors.black38,
                                   backgroundColor: Colors.teal.withOpacity(0.7),
                                 );
                               } else {

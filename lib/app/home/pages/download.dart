@@ -7,10 +7,12 @@ import 'package:getwidget/getwidget.dart';
 import 'package:qbittorrent_api/qbittorrent_api.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import '../../../api/downloader.dart';
 import '../../../common/glass_widget.dart';
 import '../../../models/download.dart';
 import '../../../models/transmission.dart';
 import '../../../utils/logger_helper.dart' as LoggerHelper;
+import '../../routes/app_pages.dart';
 import 'controller/download_controller.dart';
 
 class DownloadPage extends StatefulWidget {
@@ -90,36 +92,31 @@ class _DownloadPageState extends State<DownloadPage>
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Obx(() {
+            var isTimerActive = controller.isTimerActive.value;
             return GFIconButton(
-              icon: controller.isTimerActive.value
+              icon: isTimerActive
                   ? const Icon(Icons.pause)
                   : const Icon(Icons.play_arrow),
-              shape: GFIconButtonShape.standard,
-              color: GFColors.PRIMARY.withOpacity(0.6),
+              // shape: GFIconButtonShape.standard,
+              type: GFButtonType.transparent,
+              color: GFColors.PRIMARY,
               onPressed: () {
                 // controller.cancelPeriodicTimer();
-                controller.isTimerActive.value
-                    ? controller.periodicTimer.cancel()
+                isTimerActive
+                    ? controller.cancelPeriodicTimer()
                     : controller.startPeriodicTimer();
                 LoggerHelper.Logger.instance
                     .w(controller.periodicTimer.isActive);
-                LoggerHelper.Logger.instance.w(controller.isTimerActive.value);
-                controller.update();
+                LoggerHelper.Logger.instance.w(isTimerActive);
+                // controller.update();
               },
             );
           }),
           GFIconButton(
-            icon: const Icon(Icons.play_arrow),
-            shape: GFIconButtonShape.standard,
-            color: GFColors.PRIMARY.withOpacity(0.6),
-            onPressed: () {
-              controller.startPeriodicTimer();
-            },
-          ),
-          GFIconButton(
             icon: const Icon(Icons.add),
             shape: GFIconButtonShape.standard,
-            color: GFColors.PRIMARY.withOpacity(0.6),
+            type: GFButtonType.transparent,
+            color: GFColors.PRIMARY,
             onPressed: () {
               GFToast.showToast(
                 '添加下载器',
@@ -141,14 +138,38 @@ class _DownloadPageState extends State<DownloadPage>
     if (downloader.status.isEmpty) {
       return const GFLoader();
     }
-    LoggerHelper.Logger.instance.w(downloader.status);
+    LoggerHelper.Logger.instance.w(downloader.status.length);
     double chartHeight = 80;
+    var tooltipBehavior = TooltipBehavior(
+      enable: true,
+      shared: true,
+      decimalPlaces: 1,
+      builder: (dynamic data, dynamic point, dynamic series, int pointIndex,
+          int seriesIndex) {
+        // Logger.instance.w(data);
+        return Container(
+          padding: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            color: Colors.teal.shade300,
+            border: Border.all(width: 2, color: Colors.teal.shade400),
+          ),
+          child: Text(
+            '${series.name}: ${filesize(point.y)}',
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.black38,
+            ),
+          ),
+        );
+      },
+    );
     if (downloader.category.toLowerCase() == 'qb') {
       List<TransferInfo> dataSource = downloader.status.cast<TransferInfo>();
       chartSeriesController?.updateDataSource(
         addedDataIndexes: <int>[dataSource.length - 1],
       );
       TransferInfo res = downloader.status.last;
+
       return SizedBox(
         height: chartHeight,
         child: Row(
@@ -160,35 +181,10 @@ class _DownloadPageState extends State<DownloadPage>
                   Expanded(
                     child: SfCartesianChart(
                       plotAreaBorderWidth: 0,
-                      tooltipBehavior: TooltipBehavior(
-                        enable: true,
-                        shared: true,
-                        decimalPlaces: 1,
-                        builder: (dynamic data, dynamic point, dynamic series,
-                            int pointIndex, int seriesIndex) {
-                          // Logger.instance.w(data);
-                          return Container(
-                            padding: const EdgeInsets.all(1),
-                            decoration: BoxDecoration(
-                              color: Colors.teal.shade300,
-                              border: Border.all(
-                                  width: 2, color: Colors.teal.shade400),
-                            ),
-                            child: Text(
-                              '${series.name}: ${filesize(point.y)}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                      tooltipBehavior: tooltipBehavior,
                       primaryXAxis: CategoryAxis(
                           isVisible: false,
                           majorGridLines: const MajorGridLines(width: 0),
-                          labelStyle: const TextStyle(
-                              fontSize: 8, color: Colors.white70),
                           edgeLabelPlacement: EdgeLabelPlacement.shift),
                       primaryYAxis: NumericAxis(
                           axisLine: const AxisLine(width: 0),
@@ -196,7 +192,7 @@ class _DownloadPageState extends State<DownloadPage>
                             return ChartAxisLabel(
                               filesize(details.value),
                               const TextStyle(
-                                  fontSize: 10, color: Colors.white70),
+                                  fontSize: 10, color: Colors.black38),
                             );
                           },
                           majorTickLines: const MajorTickLines(size: 0)),
@@ -213,6 +209,9 @@ class _DownloadPageState extends State<DownloadPage>
                           yValueMapper: (TransferInfo sales, _) =>
                               sales.upInfoSpeed,
                           name: '上传速度',
+                          borderColor: Colors.black38,
+                          borderWidth: 1,
+                          borderDrawMode: BorderDrawMode.all,
                         ),
                         AreaSeries<TransferInfo, int>(
                           onRendererCreated:
@@ -227,6 +226,8 @@ class _DownloadPageState extends State<DownloadPage>
                               sales.dlInfoSpeed,
                           color: Colors.red,
                           name: '下载速度',
+                          borderColor: Colors.black38,
+                          borderWidth: 1,
                         ),
                       ],
                     ),
@@ -238,7 +239,7 @@ class _DownloadPageState extends State<DownloadPage>
                         '上传限速：${filesize(res.upRateLimit)}/S',
                         style: const TextStyle(
                           fontSize: 10,
-                          color: Colors.white70,
+                          color: Colors.black38,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -246,7 +247,7 @@ class _DownloadPageState extends State<DownloadPage>
                         '下载限速：${filesize(res.dlInfoSpeed)}/S',
                         style: const TextStyle(
                           fontSize: 10,
-                          color: Colors.white70,
+                          color: Colors.black38,
                         ),
                       ),
                     ],
@@ -272,22 +273,23 @@ class _DownloadPageState extends State<DownloadPage>
                   Expanded(
                     child: SfCartesianChart(
                       plotAreaBorderWidth: 0,
+                      tooltipBehavior: tooltipBehavior,
                       primaryXAxis: CategoryAxis(
                           isVisible: false,
                           majorGridLines: const MajorGridLines(width: 0),
-                          edgeLabelPlacement: EdgeLabelPlacement.shift),
+                          edgeLabelPlacement: EdgeLabelPlacement.none),
                       primaryYAxis: NumericAxis(
                           axisLine: const AxisLine(width: 0),
                           axisLabelFormatter: (AxisLabelRenderDetails details) {
                             return ChartAxisLabel(
                               filesize(details.value),
                               const TextStyle(
-                                  fontSize: 10, color: Colors.white70),
+                                  fontSize: 10, color: Colors.black38),
                             );
                           },
                           majorTickLines: const MajorTickLines(size: 0)),
-                      series: <AreaSeries<TransmissionStats, String>>[
-                        AreaSeries<TransmissionStats, String>(
+                      series: <AreaSeries<TransmissionStats, int>>[
+                        AreaSeries<TransmissionStats, int>(
                           onRendererCreated:
                               (ChartSeriesController controller) {
                             chartSeriesController = controller;
@@ -295,13 +297,14 @@ class _DownloadPageState extends State<DownloadPage>
                           animationDuration: 0,
                           dataSource: dataSource,
                           xValueMapper: (TransmissionStats sales, index) =>
-                              DateTime.now().toString(),
+                              index,
                           yValueMapper: (TransmissionStats sales, _) =>
                               sales.uploadSpeed,
-                          enableTooltip: true,
                           name: '上传速度',
+                          borderColor: Colors.black38,
+                          borderWidth: 1,
                         ),
-                        AreaSeries<TransmissionStats, String>(
+                        AreaSeries<TransmissionStats, int>(
                           onRendererCreated:
                               (ChartSeriesController controller) {
                             // _chartSeriesController = controller;
@@ -309,11 +312,13 @@ class _DownloadPageState extends State<DownloadPage>
                           animationDuration: 0,
                           dataSource: dataSource,
                           xValueMapper: (TransmissionStats sales, index) =>
-                              DateTime.now().toString(),
+                              index,
                           yValueMapper: (TransmissionStats sales, _) =>
                               sales.downloadSpeed,
                           enableTooltip: true,
                           name: '下载速度',
+                          borderColor: Colors.black38,
+                          borderWidth: 1,
                         ),
                       ],
                     ),
@@ -326,7 +331,7 @@ class _DownloadPageState extends State<DownloadPage>
                         '活动种子：${res.activeTorrentCount}',
                         style: const TextStyle(
                           fontSize: 10,
-                          color: Colors.white70,
+                          color: Colors.black38,
                         ),
                       ),
                       const SizedBox(
@@ -336,7 +341,7 @@ class _DownloadPageState extends State<DownloadPage>
                         '暂停种子：${res.pausedTorrentCount}',
                         style: const TextStyle(
                           fontSize: 10,
-                          color: Colors.white70,
+                          color: Colors.black38,
                         ),
                       ),
                     ],
@@ -353,15 +358,15 @@ class _DownloadPageState extends State<DownloadPage>
 
   Widget buildDownloaderCard(Downloader downloader) {
     bool connectState = true;
-    // getDownloaderConnectTest(downloader.id).then((res) {
-    //   connectState = res.code == 0;
-    // });
+    getDownloaderConnectTest(downloader.id).then((res) {
+      connectState = res.code == 0;
+    });
     ChartSeriesController? chartSeriesController;
     return GFCard(
-      margin: const EdgeInsets.only(left: 10, right: 10, bottom: 0, top: 5),
-      padding: const EdgeInsets.only(left: 0, right: 0, bottom: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 2.5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2.5),
       boxFit: BoxFit.cover,
-      color: Colors.transparent,
+      color: Colors.white54,
       title: GFListTile(
         padding: const EdgeInsets.all(0),
         avatar: GFAvatar(
@@ -373,7 +378,7 @@ class _DownloadPageState extends State<DownloadPage>
         title: Text(
           downloader.name,
           style: const TextStyle(
-            color: Colors.white70,
+            color: Colors.black38,
             fontWeight: FontWeight.bold,
             fontSize: 14,
           ),
@@ -381,15 +386,20 @@ class _DownloadPageState extends State<DownloadPage>
         subTitle: Text(
           '${downloader.http}://${downloader.host}:${downloader.port}',
           style: const TextStyle(
-            color: Colors.white70,
+            color: Colors.black38,
             fontSize: 11,
           ),
         ),
+        onTap: () {
+          controller.cancelPeriodicTimer();
+          Get.toNamed(Routes.TORRENT, arguments: downloader);
+        },
+        onLongPress: () {},
         icon: GFIconButton(
           icon: connectState
               ? const Icon(
                   Icons.bolt,
-                  color: Colors.white70,
+                  color: Colors.black38,
                   size: 24,
                 )
               : const Icon(
@@ -464,7 +474,7 @@ class _DownloadPageState extends State<DownloadPage>
                       '${filesize(res.upInfoSpeed!)}/S',
                       style: const TextStyle(
                         fontSize: 10,
-                        color: Colors.white70,
+                        color: Colors.black38,
                       ),
                     ),
                   ],
@@ -482,7 +492,7 @@ class _DownloadPageState extends State<DownloadPage>
                       '${filesize(res.dlInfoSpeed!)}/S',
                       style: const TextStyle(
                         fontSize: 10,
-                        color: Colors.white70,
+                        color: Colors.black38,
                       ),
                     ),
                   ],
@@ -500,7 +510,7 @@ class _DownloadPageState extends State<DownloadPage>
                       filesize(res.upInfoData),
                       style: const TextStyle(
                         fontSize: 10,
-                        color: Colors.white70,
+                        color: Colors.black38,
                       ),
                     ),
                   ],
@@ -519,7 +529,7 @@ class _DownloadPageState extends State<DownloadPage>
                       filesize(res.dlInfoData),
                       style: const TextStyle(
                         fontSize: 10,
-                        color: Colors.white70,
+                        color: Colors.black38,
                       ),
                     ),
                   ],
@@ -551,7 +561,7 @@ class _DownloadPageState extends State<DownloadPage>
                   '${filesize(res.uploadSpeed)}/S',
                   style: const TextStyle(
                     fontSize: 10,
-                    color: Colors.white70,
+                    color: Colors.black38,
                   ),
                 ),
               ],
@@ -569,7 +579,7 @@ class _DownloadPageState extends State<DownloadPage>
                   '${filesize(res.downloadSpeed, 0)}/S',
                   style: const TextStyle(
                     fontSize: 10,
-                    color: Colors.white70,
+                    color: Colors.black38,
                   ),
                 ),
               ],
@@ -587,7 +597,7 @@ class _DownloadPageState extends State<DownloadPage>
                   filesize(res.currentStats.uploadedBytes),
                   style: const TextStyle(
                     fontSize: 10,
-                    color: Colors.white70,
+                    color: Colors.black38,
                   ),
                 ),
               ],
@@ -606,7 +616,7 @@ class _DownloadPageState extends State<DownloadPage>
                   filesize(res.currentStats.downloadedBytes),
                   style: const TextStyle(
                     fontSize: 10,
-                    color: Colors.white70,
+                    color: Colors.black38,
                   ),
                 ),
               ],

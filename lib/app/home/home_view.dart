@@ -15,29 +15,30 @@ class HomeView extends GetView<HomeController> {
     return Scaffold(
       key: _globalKey,
       extendBody: true,
-      backgroundColor: Colors.teal.shade300,
+      // backgroundColor: Colors.white54,
       appBar: GFAppBar(
-        backgroundColor: Colors.transparent,
-        // elevation: 0.0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                Colors.green.withOpacity(0.3),
-                Colors.teal.withOpacity(0.4),
-                Colors.blue.withOpacity(0.6),
-              ],
-            ),
-          ),
-        ),
+        backgroundColor: Colors.white54,
+        elevation: 1.5,
+        iconTheme: const IconThemeData(color: Colors.black38),
+        // flexibleSpace: Container(
+        //   decoration: BoxDecoration(
+        //     gradient: LinearGradient(
+        //       begin: Alignment.centerLeft,
+        //       end: Alignment.centerRight,
+        //       colors: [
+        //         Colors.white38.withOpacity(0.3),
+        //         Colors.white54.withOpacity(0.4),
+        //         Colors.white70.withOpacity(0.6),
+        //       ],
+        //     ),
+        //   ),
+        // ),
 
         actions: <Widget>[
           GFIconButton(
             icon: const Icon(
               Icons.search,
-              color: Colors.white,
+              color: Colors.black38,
             ),
             onPressed: () {
               Get.toNamed(Routes.SEARCH);
@@ -186,7 +187,7 @@ class HomeView extends GetView<HomeController> {
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
       bottomNavigationBar: Obx(() => BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.teal.shade500.withOpacity(0.85),
+            backgroundColor: Colors.white54.withOpacity(0.85),
             elevation: 0,
             // showSelectedLabels: false,
             // showUnselectedLabels: false,

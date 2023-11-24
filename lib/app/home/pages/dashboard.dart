@@ -55,7 +55,7 @@ class _DashBoardState extends State<DashBoard>
         setState(() {
           stackChartDataList.clear();
           value.data.forEach((element) {
-            Logger.instance.w(element);
+            // Logger.instance.w(element);
             MySite mySite = MySite.fromJson(element['site']);
             List<SiteBaseStatus> statusList = element['data']
                 .map<SiteBaseStatus>((item) => SiteBaseStatus.fromJson(item))
@@ -165,7 +165,7 @@ class _DashBoardState extends State<DashBoard>
       child: Column(
         children: [
           const Text('站点数据',
-              style: TextStyle(fontSize: 12, color: Colors.white60)),
+              style: TextStyle(fontSize: 12, color: Colors.black38)),
           const SizedBox(height: 5),
           Expanded(
             child: ListView.builder(
@@ -190,7 +190,7 @@ class _DashBoardState extends State<DashBoard>
                                       filesize(status.statusUploaded!),
                                       style: const TextStyle(
                                         fontSize: 10,
-                                        color: Colors.white70,
+                                        color: Colors.black38,
                                       ),
                                       textAlign: TextAlign.right,
                                     ),
@@ -237,7 +237,7 @@ class _DashBoardState extends State<DashBoard>
                                     child: EllipsisText(
                                   text: status.mySiteNickname!,
                                   style: const TextStyle(
-                                      fontSize: 10, color: Colors.white70),
+                                      fontSize: 10, color: Colors.black38),
                                   ellipsis: '...',
                                   maxLines: 1,
                                 ))),
@@ -282,7 +282,8 @@ class _DashBoardState extends State<DashBoard>
                                       child: Text(
                                         filesize(status.statusDownloaded!),
                                         style: const TextStyle(
-                                            fontSize: 10, color: Colors.white),
+                                            fontSize: 10,
+                                            color: Colors.black38),
                                       )),
                                 ],
                               ),
@@ -302,7 +303,7 @@ class _DashBoardState extends State<DashBoard>
   Container _buildSiteInfoBar() {
     return Container(
       padding: const EdgeInsets.all(5),
-      color: Colors.teal.withOpacity(0.5),
+      color: Colors.white54,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -317,7 +318,7 @@ class _DashBoardState extends State<DashBoard>
               const SizedBox(width: 1),
               Text(
                 '站点数：${statusList.length}',
-                style: const TextStyle(color: Colors.white70, fontSize: 11),
+                style: const TextStyle(color: Colors.black38, fontSize: 11),
               ),
             ],
           ),
@@ -332,7 +333,7 @@ class _DashBoardState extends State<DashBoard>
               const SizedBox(width: 1),
               Text(
                 filesize(uploaded),
-                style: const TextStyle(color: Colors.white70, fontSize: 11),
+                style: const TextStyle(color: Colors.black38, fontSize: 11),
               ),
             ],
           ),
@@ -347,7 +348,7 @@ class _DashBoardState extends State<DashBoard>
               const SizedBox(width: 1),
               Text(
                 filesize(downloaded),
-                style: const TextStyle(color: Colors.white70, fontSize: 11),
+                style: const TextStyle(color: Colors.black38, fontSize: 11),
               ),
             ],
           ),
@@ -356,7 +357,7 @@ class _DashBoardState extends State<DashBoard>
             children: [
               const Icon(
                 Icons.share,
-                color: Colors.white70,
+                color: Colors.black38,
                 size: 12,
               ),
               const SizedBox(width: 1),
@@ -364,7 +365,7 @@ class _DashBoardState extends State<DashBoard>
                 downloaded > 0
                     ? '${(uploaded / downloaded).roundToDouble()}'
                     : '♾️',
-                style: const TextStyle(color: Colors.white70, fontSize: 11),
+                style: const TextStyle(color: Colors.black38, fontSize: 11),
               ),
             ],
           ),
@@ -373,13 +374,13 @@ class _DashBoardState extends State<DashBoard>
             children: [
               const Icon(
                 Icons.cloud_upload,
-                color: Colors.white70,
+                color: Colors.black38,
                 size: 12,
               ),
               const SizedBox(width: 1),
               Text(
                 filesize(seedVol),
-                style: const TextStyle(color: Colors.white70, fontSize: 11),
+                style: const TextStyle(color: Colors.black38, fontSize: 11),
               ),
             ],
           ),
@@ -398,7 +399,7 @@ class _DashBoardState extends State<DashBoard>
             text: '上传数据',
             textStyle: const TextStyle(
               fontSize: 11,
-              color: Colors.white60,
+              color: Colors.black38,
             )),
         centerX: '47%',
         centerY: '45%',
@@ -429,7 +430,7 @@ class _DashBoardState extends State<DashBoard>
             //         // const Icon(
             //         //   Icons.ac_unit_outlined,
             //         //   size: 12,
-            //         //   color: Colors.white70,
+            //         //   color: Colors.black38,
             //         // ),
             //         GFImageOverlay(
             //           height: 10,
@@ -442,7 +443,7 @@ class _DashBoardState extends State<DashBoard>
             //           maxWidth: 38,
             //           style: const TextStyle(
             //             fontSize: 8,
-            //             color: Colors.white70,
+            //             color: Colors.black38,
             //           ),
             //           isShowMore: false,
             //           ellipsis: '..',
@@ -454,7 +455,7 @@ class _DashBoardState extends State<DashBoard>
             // },
             textStyle: TextStyle(
               fontSize: 8,
-              color: Colors.white70,
+              color: Colors.black38,
             )),
         series: _gettSmartLabelPieSeries(),
         tooltipBehavior: TooltipBehavior(
@@ -472,7 +473,7 @@ class _DashBoardState extends State<DashBoard>
               ),
               child: Text(
                 '${data.mySiteNickname}: ${filesize(data.statusUploaded)}',
-                style: const TextStyle(fontSize: 14, color: Colors.white70),
+                style: const TextStyle(fontSize: 14, color: Colors.black38),
               ),
             );
           },
@@ -504,7 +505,7 @@ class _DashBoardState extends State<DashBoard>
           labelPosition: ChartDataLabelPosition.outside,
           textStyle: TextStyle(
             fontSize: 8,
-            color: Colors.white60,
+            color: Colors.black38,
           ),
           showZeroValue: false,
           connectorLineSettings: ConnectorLineSettings(
@@ -535,11 +536,11 @@ class _DashBoardState extends State<DashBoard>
           child: GFButton(
             icon: const Icon(
               Icons.edit_calendar,
-              color: Colors.white,
+              color: Colors.black38,
               size: 13,
             ),
             text: '签到',
-            textColor: Colors.white70,
+            textColor: Colors.black38,
             size: GFSize.SMALL,
             color: Colors.teal.withOpacity(0.7),
             // type: GFButtonType.transparent,
@@ -550,7 +551,7 @@ class _DashBoardState extends State<DashBoard>
                   Get.snackbar(
                     '签到任务',
                     '签到任务信息：${res.msg}',
-                    colorText: Colors.white70,
+                    colorText: Colors.black38,
                     backgroundColor: Colors.teal.withOpacity(0.7),
                   );
                 } else {
@@ -570,13 +571,13 @@ class _DashBoardState extends State<DashBoard>
           child: GFButton(
             color: Colors.teal.withOpacity(0.7),
             text: '更新',
-            textColor: Colors.white70,
+            textColor: Colors.black38,
             size: GFSize.SMALL,
             // type: GFButtonType.transparent,
             icon: const Icon(
               Icons.refresh,
               size: 12,
-              color: Colors.white70,
+              color: Colors.black38,
             ),
             onPressed: () {
               getNewestStatusAll().then((res) {
@@ -585,7 +586,7 @@ class _DashBoardState extends State<DashBoard>
                   Get.snackbar(
                     '更新数据',
                     '更新数据任务信息：${res.msg}',
-                    colorText: Colors.white70,
+                    colorText: Colors.black38,
                     backgroundColor: Colors.teal.withOpacity(0.7),
                   );
                 } else {
@@ -621,7 +622,7 @@ class _DashBoardState extends State<DashBoard>
                 text: '每日数据',
                 textStyle: const TextStyle(
                   fontSize: 11,
-                  color: Colors.white70,
+                  color: Colors.black38,
                 )),
             isTransposed: true,
             margin: const EdgeInsets.all(15),
@@ -633,7 +634,7 @@ class _DashBoardState extends State<DashBoard>
                 itemPadding: 5,
                 textStyle: TextStyle(
                   fontSize: 8,
-                  color: Colors.white70,
+                  color: Colors.black38,
                 )),
             enableSideBySideSeriesPlacement: false,
             plotAreaBorderWidth: 0,
@@ -657,7 +658,7 @@ class _DashBoardState extends State<DashBoard>
                     '${series.name}: ${filesize(point.y)}',
                     style: const TextStyle(
                       fontSize: 12,
-                      color: Colors.white70,
+                      color: Colors.black38,
                     ),
                   ),
                 );
@@ -668,7 +669,7 @@ class _DashBoardState extends State<DashBoard>
               axisLabelFormatter: (AxisLabelRenderDetails details) {
                 return ChartAxisLabel(
                   details.text,
-                  const TextStyle(fontSize: 10, color: Colors.white70),
+                  const TextStyle(fontSize: 10, color: Colors.black38),
                 );
               },
             ),
@@ -677,7 +678,7 @@ class _DashBoardState extends State<DashBoard>
               axisLabelFormatter: (AxisLabelRenderDetails details) {
                 return ChartAxisLabel(
                   ProperFilesize.generateHumanReadableFilesize(details.value),
-                  const TextStyle(fontSize: 10, color: Colors.white70),
+                  const TextStyle(fontSize: 10, color: Colors.black38),
                 );
               },
               majorTickLines: const MajorTickLines(size: 0),
@@ -733,197 +734,5 @@ class _DashBoardState extends State<DashBoard>
       Logger.instance.w(trace);
       return const SizedBox.shrink();
     }
-  }
-
-  Widget _buildBackColumnChart() {
-    late ZoomPanBehavior zoomPan = ZoomPanBehavior(
-      enableDoubleTapZooming: true,
-      enablePanning: true,
-      enablePinching: true,
-      enableSelectionZooming: true,
-      enableMouseWheelZooming: true,
-      zoomMode: ZoomMode.y,
-      // maximumZoomLevel: 100,
-      selectionRectBorderWidth: 3,
-    );
-    return SizedBox(
-      height: 350,
-      child: SfCartesianChart(
-        plotAreaBorderWidth: 0,
-        isTransposed: true,
-        enableSideBySideSeriesPlacement: false,
-        title: ChartTitle(
-            text: '数据汇总',
-            textStyle: const TextStyle(
-              fontSize: 11,
-              color: Colors.white60,
-            )),
-        margin: const EdgeInsets.only(right: 40, left: 15, top: 5),
-        tooltipBehavior: TooltipBehavior(
-          enable: true,
-          header: '',
-          canShowMarker: false,
-          activationMode: ActivationMode.singleTap,
-          builder: (dynamic data, dynamic point, dynamic series, int pointIndex,
-              int seriesIndex) {
-            return Container(
-              padding: const EdgeInsets.all(5),
-              width: 120,
-              height: 78,
-              decoration: BoxDecoration(
-                color: Colors.blueGrey,
-                border: Border.all(width: 2, color: Colors.teal.shade400),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.language,
-                          color: Colors.white70,
-                          size: 12,
-                        ),
-                        Text(
-                          '${data.mySiteNickname}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.upload,
-                          color: Colors.green,
-                          size: 12,
-                        ),
-                        Text(
-                          filesize(data.statusUploaded),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.download,
-                          color: Colors.deepOrange,
-                          size: 12,
-                        ),
-                        Text(
-                          filesize(data.statusDownloaded),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-        zoomPanBehavior: zoomPan,
-        primaryXAxis: CategoryAxis(
-          rangePadding: ChartRangePadding.round,
-          majorGridLines: const MajorGridLines(width: 0),
-          isInversed: true,
-          autoScrollingMode: AutoScrollingMode.end,
-          labelStyle: const TextStyle(fontSize: 10, color: Colors.white70),
-          labelPosition: ChartDataLabelPosition.inside,
-          tickPosition: TickPosition.inside,
-          placeLabelsNearAxisLine: true,
-        ),
-        primaryYAxis: NumericAxis(
-          axisLine: const AxisLine(width: 1),
-          zoomFactor: 0.9,
-          zoomPosition: 1,
-          visibleMinimum: 2.0,
-          majorTickLines: const MajorTickLines(size: 0),
-          majorGridLines: const MajorGridLines(width: 0.5),
-          rangePadding: ChartRangePadding.additional,
-          axisLabelFormatter: (AxisLabelRenderDetails details) {
-            return ChartAxisLabel(
-              ProperFilesize.generateHumanReadableFilesize(details.value),
-              const TextStyle(fontSize: 10, color: Colors.white70),
-            );
-          },
-        ),
-        series: _getBackToBackColumn(),
-      ),
-    );
-  }
-
-  List<ColumnSeries<SiteStatus, String>> _getBackToBackColumn() {
-    // List<SiteStatus> dataSource = statusList.sublist(0);
-    // dataSource.sort((SiteStatus b, SiteStatus a) =>
-    //     b.statusUploaded!.compareTo(a.statusUploaded!));
-    return <ColumnSeries<SiteStatus, String>>[
-      ColumnSeries<SiteStatus, String>(
-        dataSource: statusList,
-        width: 0.7,
-        xValueMapper: (SiteStatus status, _) => status.mySiteNickname,
-        yValueMapper: (SiteStatus status, _) => status.statusUploaded,
-        dataLabelMapper: (SiteStatus status, _) =>
-            '${status.mySiteNickname!}: ⬆ ${filesize(status.statusUploaded ?? 0)} ⬇ ${filesize(status.statusDownloaded)}',
-        name: '上传',
-        borderRadius: BorderRadius.circular(5),
-        dataLabelSettings: const DataLabelSettings(
-          margin: EdgeInsets.zero,
-          isVisible: false,
-          labelPosition: ChartDataLabelPosition.outside,
-          textStyle: TextStyle(
-            fontSize: 8,
-            color: Colors.white60,
-          ),
-          showZeroValue: false,
-          connectorLineSettings: ConnectorLineSettings(
-            type: ConnectorType.curve,
-            length: '20%',
-          ),
-          labelIntersectAction: LabelIntersectAction.shift,
-        ),
-      ),
-      ColumnSeries<SiteStatus, String>(
-        dataSource: statusList,
-        width: 0.5,
-        xValueMapper: (SiteStatus status, _) => status.mySiteNickname,
-        yValueMapper: (SiteStatus status, _) => status.statusDownloaded,
-        // dataLabelMapper: (SiteStatus status, _) =>
-        //     '${status.mySiteNickname!}:下载 ${filesize(status.statusDownloaded)}',
-        name: '下载',
-        borderRadius: BorderRadius.circular(5),
-        dataLabelSettings: const DataLabelSettings(
-          margin: EdgeInsets.zero,
-          isVisible: false,
-          labelPosition: ChartDataLabelPosition.outside,
-          textStyle: TextStyle(
-            fontSize: 8,
-            color: Colors.white60,
-          ),
-          showZeroValue: false,
-          connectorLineSettings: ConnectorLineSettings(
-            type: ConnectorType.curve,
-            length: '20%',
-          ),
-          labelIntersectAction: LabelIntersectAction.shift,
-        ),
-      ),
-    ];
   }
 }

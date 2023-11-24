@@ -38,7 +38,7 @@ class DownloadController extends GetxController {
     // 设置一个5分钟后执行的定时器
     fiveMinutesTimer = Timer(const Duration(minutes: 5), () {
       // 定时器触发后执行的操作，这里可以取消periodicTimer、关闭资源等
-      periodicTimer.cancel();
+      cancelPeriodicTimer();
       // 你可以在这里添加其他需要在定时器触发后执行的逻辑
     });
     LoggerHelper.Logger.instance.w(periodicTimer);
@@ -72,6 +72,9 @@ class DownloadController extends GetxController {
         dynamic status = await getIntervalSpeed(item);
         // 更新下载项的状态
         item.status.add(status.data);
+        if (item.status.length > 30) {
+          item.status.removeAt(0);
+        }
         _downloadStreamController.sink.add([item]);
         update();
       } catch (e) {
@@ -105,22 +108,11 @@ class DownloadController extends GetxController {
     try {
       LoggerHelper.Logger.instance.w(downloader.name);
       if (downloader.category.toLowerCase() == 'qb') {
-        final qbittorrent = QBittorrentApiV2(
-          baseUrl: '${downloader.http}://${downloader.host}:${downloader.port}',
-          cookiePath: (await getApplicationDocumentsDirectory()).path,
-          logger: true,
-        );
-        await qbittorrent.auth.login(
-          username: downloader.username!,
-          password: downloader.password!,
-        );
+        await getQbInstance(downloader);
         return CommonResponse(
             data: null, msg: '${downloader.name} 连接成功!', code: 0);
       } else {
-        final transmission = Transmission(
-          '${downloader.http}://${downloader.host}:${downloader.port}',
-          AuthKeys(downloader.username!, downloader.password!),
-        );
+        Transmission transmission = getTrInstance(downloader);
         var res = await transmission.v1.session.sessionStats();
         LoggerHelper.Logger.instance.w(res);
         return CommonResponse(
@@ -133,6 +125,12 @@ class DownloadController extends GetxController {
   }
 
   Future getQbSpeed(Downloader downloader) async {
+    QBittorrentApiV2 qbittorrent = await getQbInstance(downloader);
+    TransferInfo res = await qbittorrent.transfer.getGlobalTransferInfo();
+    return CommonResponse(data: res);
+  }
+
+  Future<QBittorrentApiV2> getQbInstance(Downloader downloader) async {
     final qbittorrent = QBittorrentApiV2(
       baseUrl: '${downloader.http}://${downloader.host}:${downloader.port}',
       cookiePath: (await getApplicationDocumentsDirectory()).path,
@@ -142,15 +140,11 @@ class DownloadController extends GetxController {
       username: downloader.username!,
       password: downloader.password!,
     );
-    TransferInfo res = await qbittorrent.transfer.getGlobalTransferInfo();
-    return CommonResponse(data: res);
+    return qbittorrent;
   }
 
   Future getTrSpeed(Downloader downloader) async {
-    final transmission = Transmission(
-      '${downloader.http}://${downloader.host}:${downloader.port}',
-      AuthKeys(downloader.username!, downloader.password!),
-    );
+    Transmission transmission = getTrInstance(downloader);
     var res = await transmission.v1.session.sessionStats();
     LoggerHelper.Logger.instance.w(res);
     if (res['result'] == "success") {
@@ -161,6 +155,14 @@ class DownloadController extends GetxController {
       data: res,
       msg: '${downloader.name} 获取实时信息失败！',
     );
+  }
+
+  Transmission getTrInstance(Downloader downloader) {
+    final transmission = Transmission(
+      '${downloader.http}://${downloader.host}:${downloader.port}',
+      AuthKeys(downloader.username!, downloader.password!),
+    );
+    return transmission;
   }
 
   dynamic getIntervalSpeed(Downloader downloader) {
