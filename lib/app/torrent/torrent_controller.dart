@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qbittorrent_api/qbittorrent_api.dart';
-import 'package:transmission_api/transmission_api.dart';
+import 'package:transmission_api/transmission_api.dart' as tr;
 
 import '../../../../utils/logger_helper.dart' as LoggerHelper;
 import '../../models/download.dart';
@@ -14,12 +15,108 @@ class TorrentController extends GetxController {
 
   late Downloader downloader;
   final torrents = [].obs;
+  final showTorrents = [].obs;
+  final categories = <Map<String, String>>[
+    {'name': '全部', 'value': 'all_torrents'},
+    {'name': '未分类', 'value': ''},
+  ].obs;
+  final category = 'all_torrents'.obs;
   late Timer periodicTimer;
   RxBool isTimerActive = true.obs; // 使用 RxBool 控制定时器是否激活
+  final sortKey = 'name'.obs;
+  final sortReversed = false.obs;
+  final searchController = TextEditingController().obs;
+  final searchKey = ''.obs;
+  final statusList = RxList().obs;
+  Rx<TorrentState?> torrentState = Rx<TorrentState?>(null);
+  Rx<TorrentFilter> torrentFilter = Rx<TorrentFilter>(TorrentFilter.all);
+
+  List filters = [
+    {"name": "全部", "value": TorrentFilter.all},
+    {"name": "下载中", "value": TorrentFilter.downloading},
+    {"name": "活动中", "value": TorrentFilter.active},
+    {"name": "暂停中", "value": TorrentFilter.paused},
+    {"name": "上传中", "value": TorrentFilter.seeding},
+    {"name": "静默中", "value": TorrentFilter.inactive},
+    {"name": "移动中", "value": TorrentFilter.moving},
+    {"name": "已完成", "value": TorrentFilter.completed},
+    {"name": "已恢复", "value": TorrentFilter.resumed},
+    {"name": "等待中", "value": TorrentFilter.stalled},
+    {"name": "校验中", "value": TorrentFilter.checking},
+    {"name": "下载队列", "value": TorrentFilter.stalledDownloading},
+    {"name": "上传队列", "value": TorrentFilter.stalledUploading},
+    {"name": "错误", "value": TorrentFilter.errored},
+  ];
+
+  List status = [
+    {"name": "全部", "value": null},
+    {"name": "下载中", "value": TorrentState.downloading},
+    {"name": "上传中", "value": TorrentState.uploading},
+    {"name": "做种中", "value": TorrentState.stalledUP},
+    {"name": "等待下载", "value": TorrentState.stalledDL},
+    {"name": "移动中", "value": TorrentState.moving},
+    {"name": "下载暂停", "value": TorrentState.pausedDL},
+    {"name": "上传暂停", "value": TorrentState.pausedUP},
+    {"name": "队列下载中", "value": TorrentState.queuedDL},
+    {"name": "队列上传中", "value": TorrentState.queuedUP},
+    // {"name": "分配中", "value": TorrentState.allocating},
+    {"name": "检查下载", "value": TorrentState.checkingDL},
+    {"name": "检查恢复数据", "value": TorrentState.checkingResumeData},
+    {"name": "检查上传", "value": TorrentState.checkingUP},
+    {"name": "强制下载", "value": TorrentState.forcedDL},
+    {"name": "强制元数据下载", "value": TorrentState.forcedMetaDL},
+    {"name": "强制上传", "value": TorrentState.forcedUP},
+    {"name": "元数据下载中", "value": TorrentState.metaDL},
+    {"name": "缺失文件", "value": TorrentState.missingFiles},
+
+    // {"name": "未知状态", "value": TorrentState.unknown},
+    {"name": "错误", "value": TorrentState.error},
+  ];
+  List<Map<String, String>> trSortOptions = [
+    {'name': '名称', 'value': 'name'},
+    {'name': 'ID', 'value': 'id'},
+    {'name': '状态', 'value': 'status'},
+    {'name': '总大小', 'value': 'totalSize'},
+    {'name': '队列位置', 'value': 'queuePosition'},
+    {'name': '完成日期', 'value': 'doneDate'},
+    {'name': '完成百分比', 'value': 'percentDone'},
+    {'name': '已上传', 'value': 'uploadedEver'},
+    {'name': '已下载', 'value': 'downloaded'},
+    {'name': '下载速度', 'value': 'rateDownload'},
+    {'name': '上传速度', 'value': 'rateUpload'},
+    {'name': '校验进度', 'value': 'recheckProgress'},
+    {'name': '活动日期', 'value': 'activityDate'},
+  ];
+  List<Map<String, String>> qbSortOptions = [
+    {'name': '名称', 'value': 'name'},
+    {'name': '类别', 'value': 'category'},
+    {'name': '大小', 'value': 'size'},
+    {'name': '添加时间', 'value': 'addedOn'},
+    {'name': '总大小', 'value': 'totalSize'},
+    {'name': '状态', 'value': 'state'},
+    {'name': '追踪器', 'value': 'tracker'},
+    {'name': '进度', 'value': 'progress'},
+    {'name': '已上传', 'value': 'uploaded'},
+    {'name': '已下载', 'value': 'downloaded'},
+    {'name': '下载速度', 'value': 'dlSpeed'},
+    {'name': '上传速度', 'value': 'upSpeed'},
+    {'name': '最后活动时间', 'value': 'lastActivity'},
+    {'name': '活跃时间', 'value': 'timeActive'},
+    {'name': '保存路径', 'value': 'savePath'},
+    {'name': '完成数', 'value': 'completed'},
+    {'name': '完成时间', 'value': 'completionOn'},
+    {'name': 'Leechs 数量', 'value': 'numLeechs'},
+    {'name': 'Seeds 数量', 'value': 'numSeeds'},
+    {'name': '未完成数', 'value': 'numIncomplete'},
+    {'name': '已完成数', 'value': 'numComplete'},
+    {'name': '优先级', 'value': 'priority'},
+    {'name': '已查看完成', 'value': 'seenComplete'},
+  ];
 
   @override
   void onInit() {
     downloader = Get.arguments;
+    getAllCategory();
     getAllTorrents();
     startPeriodicTimer();
     Timer(const Duration(minutes: 5), () {
@@ -33,9 +130,19 @@ class TorrentController extends GetxController {
 
   void startPeriodicTimer() {
     // 设置定时器，每隔一定时间刷新下载器数据
-    periodicTimer = Timer.periodic(const Duration(seconds: 5), (Timer t) {
+    periodicTimer = Timer.periodic(const Duration(seconds: 5), (Timer t) async {
       // 在定时器触发时获取最新的下载器数据
       getAllTorrents();
+      dynamic status = await downloadController.getIntervalSpeed(downloader);
+      LoggerHelper.Logger.instance.w('state77:${status.code}');
+      if (status.code == 0) {
+        LoggerHelper.Logger.instance.w(statusList.value.length);
+        statusList.value.add(status.data);
+        if (statusList.value.length > 30) {
+          statusList.value.removeAt(0);
+        }
+        update();
+      }
     });
     isTimerActive.value = true;
   }
@@ -56,20 +163,307 @@ class TorrentController extends GetxController {
   @override
   void onClose() {
     periodicTimer.cancel();
+    categories.value = <Map<String, String>>[
+      {'name': '全部', 'value': 'all_torrents'},
+      {'name': '未分类', 'value': ''},
+    ];
+    torrents.clear();
+    showTorrents.clear();
+    category.value = 'all_torrent';
     super.onClose();
+  }
+
+  getAllCategory() async {
+    if (downloader.category.toLowerCase() == 'qb') {
+      QBittorrentApiV2 qbittorrent =
+          await downloadController.getQbInstance(downloader);
+      qbittorrent.torrents.getCategories().then((value) {
+        categories.addAll(value.keys
+            .map<Map<String, String>>((e) => {'name': e, 'value': e})
+            .toList());
+        categories.value = categories.toSet().toList();
+        LoggerHelper.Logger.instance.w(categories);
+      });
+    }
+  }
+
+  sortTorrents() {
+    if (downloader.category.toLowerCase() == 'qb') {
+      switch (sortKey.value) {
+        case 'name':
+          showTorrents.sort((a, b) => a.name!.compareTo(b.name!));
+        case 'category':
+          showTorrents.sort((a, b) => a.category!.compareTo(b.category!));
+        case 'size':
+          showTorrents.sort((a, b) => a.size!.compareTo(b.size!));
+        case 'addedOn':
+          showTorrents.sort((a, b) => a.addedOn!.compareTo(b.addedOn!));
+        case 'totalSize':
+          showTorrents.sort((a, b) => a.totalSize!.compareTo(b.totalSize!));
+        case 'state':
+          showTorrents.sort(
+              (a, b) => a.state!.toString().compareTo(b.state!.toString()));
+        case 'tracker':
+          showTorrents.sort((a, b) => a.tracker!.compareTo(b.tracker!));
+        case 'progress':
+          showTorrents.sort((a, b) => a.progress!.compareTo(b.progress!));
+        case 'uploaded':
+          showTorrents.sort((a, b) => a.uploaded!.compareTo(b.uploaded!));
+        case 'downloaded':
+          showTorrents.sort((a, b) => a.downloaded!.compareTo(b.downloaded!));
+        case 'dlSpeed':
+          showTorrents.sort((a, b) => a.dlSpeed!.compareTo(b.dlSpeed!));
+        case 'upSpeed':
+          showTorrents.sort((a, b) => a.upSpeed!.compareTo(b.upSpeed!));
+        case 'lastActivity':
+          showTorrents
+              .sort((a, b) => a.lastActivity!.compareTo(b.lastActivity!));
+        case 'timeActive':
+          showTorrents.sort((a, b) => a.timeActive!.compareTo(b.timeActive!));
+        case 'savePath':
+          showTorrents.sort((a, b) => a.savePath!.compareTo(b.savePath!));
+        case 'completed':
+          showTorrents.sort((a, b) => a.completed!.compareTo(b.completed!));
+        case 'completionOn':
+          showTorrents
+              .sort((a, b) => a.completionOn!.compareTo(b.completionOn!));
+        case 'numLeechs':
+          showTorrents.sort((a, b) => a.numLeechs!.compareTo(b.numLeechs!));
+        case 'numSeeds':
+          showTorrents.sort((a, b) => a.numSeeds!.compareTo(b.numSeeds!));
+        case 'numIncomplete':
+          showTorrents
+              .sort((a, b) => a.numIncomplete!.compareTo(b.numIncomplete!));
+        case 'numComplete':
+          showTorrents.sort((a, b) => a.numComplete!.compareTo(b.numComplete!));
+        case 'priority':
+          showTorrents.sort((a, b) => a.priority!.compareTo(b.priority!));
+        case 'seenComplete':
+          showTorrents
+              .sort((a, b) => a.seenComplete!.compareTo(b.seenComplete!));
+        default:
+          Get.snackbar('出错啦！', '未知排序规则：${sortKey.value}');
+      }
+    } else {
+      switch (sortKey.value) {
+        case 'name':
+          showTorrents.sort((a, b) => a.name!.compareTo(b.name!));
+        case 'id':
+          showTorrents.sort((a, b) => a.id!.compareTo(b.id!));
+        case 'status':
+          showTorrents.sort((a, b) => a.status!.compareTo(b.status!));
+        // case 'addedOn':
+        //   torrents
+        //       .sort(( a, b) => a.addedOn!.compareTo(b.addedOn!));
+        case 'totalSize':
+          showTorrents.sort((a, b) => a.totalSize!.compareTo(b.totalSize!));
+        case 'queuePosition':
+          showTorrents.sort((a, b) => a.queuePosition!
+              .toString()
+              .compareTo(b.queuePosition!.toString()));
+        case 'doneDate':
+          showTorrents.sort((a, b) => a.doneDate!.compareTo(b.doneDate!));
+        case 'percentDone':
+          showTorrents.sort((a, b) => a.percentDone!.compareTo(b.percentDone!));
+        case 'uploadedEver':
+          showTorrents
+              .sort((a, b) => a.uploadedEver!.compareTo(b.uploadedEver!));
+        case 'downloaded':
+          showTorrents
+              .sort((a, b) => a.downloadedEver!.compareTo(b.downloadedEver!));
+        case 'rateDownload':
+          showTorrents
+              .sort((a, b) => a.rateDownload!.compareTo(b.rateDownload!));
+        case 'rateUpload':
+          showTorrents.sort((a, b) => a.rateUpload!.compareTo(b.rateUpload!));
+        case 'recheckProgress':
+          showTorrents
+              .sort((a, b) => a.recheckProgress!.compareTo(b.recheckProgress!));
+        case 'activityDate':
+          showTorrents
+              .sort((a, b) => a.activityDate!.compareTo(b.activityDate!));
+        default:
+          Get.snackbar('出错啦！', '未知排序规则：${sortKey.value}');
+      }
+    }
+    if (sortReversed.value) {
+      LoggerHelper.Logger.instance.w('反转序列！');
+      showTorrents.value = showTorrents.reversed.toList();
+    }
+  }
+
+  filterTorrentsByCategory() {
+    if (category.value == 'all_torrents') {
+      showTorrents.value = torrents;
+    } else if (category.value == '') {
+      showTorrents.value =
+          torrents.where((torrent) => torrent.category.isEmpty).toList();
+    } else {
+      showTorrents.value = torrents
+          .where((torrent) => torrent.category == category.value)
+          .toList();
+    }
+  }
+
+  filterTorrentsByState() {
+    if (downloader.category.toLowerCase() == 'qb') {
+      if (torrentState.value == null) {
+        showTorrents.value = torrents;
+      } else {
+        showTorrents.value = torrents
+            .where((torrent) => torrent.state == torrentState.value)
+            .toList();
+      }
+    } else {
+      showTorrents.value = torrents;
+    }
+  }
+
+  filterTorrentsBySearchKey() {
+    LoggerHelper.Logger.instance.w(searchKey.value);
+    if (downloader.category.toLowerCase() == 'qb') {
+      showTorrents.value = torrents
+          .where((torrent) =>
+              torrent.name!
+                  .toLowerCase()
+                  .contains(searchKey.value.toLowerCase()) ||
+              torrent.category
+                  .toLowerCase()
+                  .contains(searchKey.value.toLowerCase()))
+          .toList();
+    } else {
+      showTorrents.value = torrents
+          .where((torrent) => torrent.name!
+              .toLowerCase()
+              .contains(searchKey.value.toLowerCase()))
+          .toList();
+    }
   }
 
   Future<void> getAllTorrents() async {
     if (downloader.category.toLowerCase() == 'qb') {
       QBittorrentApiV2 qbittorrent =
           await downloadController.getQbInstance(downloader);
+
+      torrents.value = await qbittorrent.torrents.getTorrentsList(
+        options: TorrentListOptions(
+            // category: category.value != 'all_torrents' ? category.value : null,
+            // sort: TorrentSort.name,
+            filter: torrentFilter.value),
+      );
+
+      LoggerHelper.Logger.instance.w(torrents.length);
+    } else {
+      tr.Transmission transmission =
+          downloadController.getTrInstance(downloader);
+      Map res = await transmission.v1.torrent.torrentGet(
+          fields: tr.TorrentFields()
+              .id
+              .name
+              .status
+              .totalSize
+              .percentDone
+              .trackerStats
+              .leftUntilDone
+              .rateDownload
+              .rateUpload
+              .recheckProgress
+              .peersGettingFromUs
+              .peersSendingToUs
+              .uploadRatio
+              .hashString
+              .magnetLink
+              .uploadedEver
+              .downloadedEver
+              .error
+              .errorString
+              .doneDate
+              .queuePosition
+              .activityDate);
+
+      LoggerHelper.Logger.instance.w(res['arguments']["torrents"].length);
+      if (res['result'] == "success") {
+        torrents.value = res['arguments']["torrents"]
+            .map<TransmissionBaseTorrent>(
+                (item) => TransmissionBaseTorrent.fromJson(item))
+            .toList();
+      }
+    }
+    // if (sortReversed.value) {
+    //   LoggerHelper.Logger.instance.w('反转序列！');
+    //   showTorrents.value = showTorrents.reversed.toList();
+    //   sortReversed.value = false;
+    // }
+    filterTorrentsBySearchKey();
+    filterTorrentsByCategory();
+    sortTorrents();
+    update();
+  }
+
+  Future<void> controlTorrents({
+    required String command,
+    required List<String> hashes,
+    String category = '',
+    bool deleteFiles = false,
+    bool enable = true,
+    int limit = 0,
+    RatioLimit ratioLimit = const RatioLimit.none(),
+    RatioLimit seedingTimeLimit = const RatioLimit.none(),
+  }) async {
+    if (downloader.category.toLowerCase() == 'qb') {
+      QBittorrentApiV2 qbittorrent =
+          await downloadController.getQbInstance(downloader);
+      switch (command) {
+        case 'pause':
+          await qbittorrent.torrents
+              .pauseTorrents(torrents: Torrents(hashes: hashes));
+        case 'reannounce':
+          await qbittorrent.torrents
+              .reannounceTorrents(torrents: Torrents(hashes: hashes));
+        case 'recheck':
+          await qbittorrent.torrents
+              .recheckTorrents(torrents: Torrents(hashes: hashes));
+        case 'resume':
+          await qbittorrent.torrents
+              .resumeTorrents(torrents: Torrents(hashes: hashes));
+        case 'SuperSeeding':
+          await qbittorrent.torrents.setSuperSeeding(
+              torrents: Torrents(hashes: hashes), enable: enable);
+        case 'AutoManagement':
+          await qbittorrent.torrents.setAutoManagement(
+              torrents: Torrents(hashes: hashes), enable: enable);
+        case 'Category':
+          await qbittorrent.torrents.setCategory(
+              torrents: Torrents(hashes: hashes), category: category);
+        case 'DownloadLimit':
+          await qbittorrent.torrents.setDownloadLimit(
+              torrents: Torrents(hashes: hashes), limit: limit);
+        case 'UploadLimit':
+          await qbittorrent.torrents
+              .setUploadLimit(torrents: Torrents(hashes: hashes), limit: limit);
+        case 'ForceStart':
+          await qbittorrent.torrents.setForceStart(
+              torrents: Torrents(hashes: hashes), enable: enable);
+        case 'ShareLimit':
+          await qbittorrent.torrents.setShareLimit(
+              torrents: Torrents(hashes: hashes),
+              ratioLimit: ratioLimit,
+              seedingTimeLimit: seedingTimeLimit);
+        case 'delete':
+          await qbittorrent.torrents
+              .deleteTorrents(torrents: Torrents(hashes: hashes));
+        default:
+          Get.snackbar('出错啦！', '未知操作：$command');
+      }
+
       torrents.value = await qbittorrent.torrents
           .getTorrentsList(options: const TorrentListOptions());
       LoggerHelper.Logger.instance.w(torrents.length);
     } else {
-      Transmission transmission = downloadController.getTrInstance(downloader);
+      tr.Transmission transmission =
+          downloadController.getTrInstance(downloader);
       Map res = await transmission.v1.torrent
-          .torrentGet(fields: TorrentFields.basic());
+          .torrentGet(fields: tr.TorrentFields.basic());
 
       LoggerHelper.Logger.instance.w(res['arguments']["torrents"].length);
       if (res['result'] == "success") {
