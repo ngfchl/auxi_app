@@ -130,7 +130,9 @@ class TorrentController extends GetxController {
 
   void startPeriodicTimer() {
     // 设置定时器，每隔一定时间刷新下载器数据
-    periodicTimer = Timer.periodic(const Duration(seconds: 5), (Timer t) async {
+    periodicTimer = Timer.periodic(
+        Duration(milliseconds: (downloadController.duration * 1000).toInt()),
+        (Timer t) async {
       // 在定时器触发时获取最新的下载器数据
       getAllTorrents();
       dynamic status = await downloadController.getIntervalSpeed(downloader);

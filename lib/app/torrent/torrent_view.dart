@@ -24,7 +24,6 @@ class TorrentView extends GetView<TorrentController> {
 
   @override
   Widget build(BuildContext context) {
-    ChartSeriesController? chartSeriesController;
     var tooltipBehavior = TooltipBehavior(
       enable: true,
       shared: true,
@@ -348,10 +347,6 @@ class TorrentView extends GetView<TorrentController> {
                             majorTickLines: const MajorTickLines(size: 0)),
                         series: [
                           AreaSeries<TransferInfo, int>(
-                            onRendererCreated:
-                                (ChartSeriesController controller) {
-                              chartSeriesController = controller;
-                            },
                             animationDuration: 0,
                             dataSource: controller.statusList.value
                                 .cast<TransferInfo>(),
@@ -365,10 +360,6 @@ class TorrentView extends GetView<TorrentController> {
                             borderDrawMode: BorderDrawMode.all,
                           ),
                           AreaSeries<TransferInfo, int>(
-                            onRendererCreated:
-                                (ChartSeriesController controller) {
-                              chartSeriesController = controller;
-                            },
                             animationDuration: 0,
                             dataSource: controller.statusList.value
                                 .cast<TransferInfo>(),
@@ -523,10 +514,6 @@ class TorrentView extends GetView<TorrentController> {
                           majorTickLines: const MajorTickLines(size: 0)),
                       series: <AreaSeries<TransmissionStats, int>>[
                         AreaSeries<TransmissionStats, int>(
-                          onRendererCreated:
-                              (ChartSeriesController controller) {
-                            chartSeriesController = controller;
-                          },
                           animationDuration: 0,
                           dataSource: controller.statusList.value
                               .cast<TransmissionStats>(),
@@ -539,10 +526,6 @@ class TorrentView extends GetView<TorrentController> {
                           borderWidth: 1,
                         ),
                         AreaSeries<TransmissionStats, int>(
-                          onRendererCreated:
-                              (ChartSeriesController controller) {
-                            chartSeriesController = controller;
-                          },
                           animationDuration: 0,
                           dataSource: controller.statusList.value
                               .cast<TransmissionStats>(),
@@ -586,38 +569,20 @@ class TorrentView extends GetView<TorrentController> {
               },
             );
           }),
-          // GFIconButton(
-          //   icon: const Icon(Icons.filter_alt),
-          //   shape: GFIconButtonShape.standard,
-          //   type: GFButtonType.transparent,
-          //   color: GFColors.PRIMARY,
-          //   onPressed: () {
-          //     controller.getAllCategory();
-          // GFToast.showToast(
-          //   '筛选',
-          //   context,
-          //   backgroundColor: GFColors.SECONDARY,
-          //   toastBorderRadius: 5.0,
-          // );
-          // Get.defaultDialog(
-          //     title: '分类选择',
-          //     content: ListView.builder(itemBuilder: (context, index) {}));
-          // },
-          // ),
-          // GFIconButton(
-          //   icon: const Icon(Icons.add),
-          //   shape: GFIconButtonShape.standard,
-          //   type: GFButtonType.transparent,
-          //   color: GFColors.PRIMARY,
-          //   onPressed: () {
-          //     GFToast.showToast(
-          //       '添加种子',
-          //       context,
-          //       backgroundColor: GFColors.SECONDARY,
-          //       toastBorderRadius: 5.0,
-          //     );
-          //   },
-          // ),
+          GFIconButton(
+            icon: const Icon(Icons.add),
+            shape: GFIconButtonShape.standard,
+            type: GFButtonType.transparent,
+            color: GFColors.PRIMARY,
+            onPressed: () {
+              GFToast.showToast(
+                '添加种子',
+                context,
+                backgroundColor: GFColors.SECONDARY,
+                toastBorderRadius: 5.0,
+              );
+            },
+          ),
           const SizedBox(height: 72)
         ],
       ),

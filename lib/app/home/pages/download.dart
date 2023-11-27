@@ -1,6 +1,8 @@
+import 'package:auxi_app/utils/storage.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_ellipsis_text/flutter_ellipsis_text.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
@@ -11,6 +13,7 @@ import '../../../common/glass_widget.dart';
 import '../../../models/download.dart';
 import '../../../models/transmission.dart';
 import '../../../utils/logger_helper.dart' as LoggerHelper;
+import '../../../utils/range_input.dart';
 import '../../routes/app_pages.dart';
 import 'controller/download_controller.dart';
 
@@ -111,6 +114,146 @@ class _DownloadPageState extends State<DownloadPage>
               },
             );
           }),
+          GFIconButton(
+              icon: const Icon(Icons.settings),
+              shape: GFIconButtonShape.standard,
+              type: GFButtonType.transparent,
+              color: GFColors.PRIMARY,
+              onPressed: () {
+                // controller.getAllCategory();
+                // GFToast.showToast(
+                //   '设置',
+                //   context,
+                //   backgroundColor: GFColors.SECONDARY,
+                //   toastBorderRadius: 5.0,
+                // );
+                TextEditingController durationTextEditingController =
+                    TextEditingController(text: controller.duration.toString());
+                TextEditingController timerDurationTextEditingController =
+                    TextEditingController(
+                        text: controller.timerDuration.toString());
+                Get.bottomSheet(
+                  SizedBox(
+                    height: 200,
+                    child: ListView(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Obx(() {
+                                return TextField(
+                                  controller: durationTextEditingController,
+                                  decoration: InputDecoration(
+                                    labelText: '刷新时间',
+                                    hintText: '3-10',
+                                    labelStyle: const TextStyle(fontSize: 10),
+                                    hintStyle: const TextStyle(fontSize: 10),
+                                    prefixIcon:
+                                        const Icon(Icons.timer_3, size: 15),
+                                    errorText: controller.isDurationValid.value
+                                        ? null
+                                        : 'Invalid input',
+                                  ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp(r'^\d{0,2}(\.\d{0,2})?$')),
+                                    RangeInputFormatter(min: 3, max: 10),
+                                  ],
+                                  onChanged: (value) {
+                                    controller.validateInput(value);
+                                  },
+                                );
+                              }),
+                            ),
+                            GFIconButton(
+                                type: GFButtonType.transparent,
+                                icon: const Icon(Icons.save),
+                                onPressed: () {
+                                  try {
+                                    double duration = double.parse(
+                                        durationTextEditingController.text);
+                                    if (duration < 3 || duration > 10) {
+                                      Get.snackbar('出错啦', '超出范围，请设置 3-10');
+                                    } else {
+                                      controller.duration.value = duration;
+                                      SPUtil.setDouble('duration', duration);
+                                      controller.cancelPeriodicTimer();
+                                      controller.startPeriodicTimer();
+                                      controller.update();
+                                      Get.snackbar('OK 啦', '保存成功！');
+                                    }
+                                  } catch (e) {
+                                    Get.snackbar('出错啦', '请输入数字');
+                                  }
+                                })
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Obx(() {
+                                return TextField(
+                                  controller:
+                                      timerDurationTextEditingController,
+                                  decoration: InputDecoration(
+                                    labelText: '刷新时长',
+                                    hintText: '3-10',
+                                    labelStyle: const TextStyle(fontSize: 10),
+                                    hintStyle: const TextStyle(fontSize: 10),
+                                    prefixIcon:
+                                        const Icon(Icons.timer_3, size: 15),
+                                    errorText: controller.isDurationValid.value
+                                        ? null
+                                        : 'Invalid input',
+                                  ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp(r'^\d{0,2}(\.\d{0,2})?$')),
+                                    RangeInputFormatter(min: 1, max: 10),
+                                  ],
+                                  onChanged: (value) {
+                                    controller.validateInput(value, min: 1);
+                                  },
+                                );
+                              }),
+                            ),
+                            GFIconButton(
+                                type: GFButtonType.transparent,
+                                icon: const Icon(Icons.save),
+                                onPressed: () {
+                                  try {
+                                    double duration = double.parse(
+                                        timerDurationTextEditingController
+                                            .text);
+                                    if (duration < 1 || duration > 10) {
+                                      Get.snackbar('出错啦', '超出范围，请设置 1-10');
+                                    } else {
+                                      controller.timerDuration.value = duration;
+                                      SPUtil.setDouble(
+                                          'timerDuration', duration);
+                                      controller.fiveMinutesTimer.cancel();
+                                      controller.timerToStop();
+                                      controller.update();
+                                      Get.snackbar('OK 啦', '保存成功！');
+                                    }
+                                  } catch (e) {
+                                    Get.snackbar('出错啦', '请输入数字');
+                                  }
+                                })
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  backgroundColor: Colors.white54.withOpacity(0.9),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(2),
+                      topRight: Radius.circular(2),
+                    ),
+                  ),
+                );
+              }),
           GFIconButton(
             icon: const Icon(Icons.add),
             shape: GFIconButtonShape.standard,
@@ -427,7 +570,9 @@ class _DownloadPageState extends State<DownloadPage>
           },
         ),
       ),
-      content: _buildLiveLineChart(downloader, chartSeriesController),
+      content: GetBuilder<DownloadController>(builder: (controller) {
+        return _buildLiveLineChart(downloader, chartSeriesController);
+      }),
       // buttonBar: GFButtonBar(
       //   children: <Widget>[
       //     GFButton(
