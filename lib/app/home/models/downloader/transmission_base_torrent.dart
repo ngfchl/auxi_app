@@ -1,24 +1,27 @@
 class TransmissionBaseTorrent {
   int? activityDate;
   int? doneDate;
-  int? downloadedEver;
+  num? downloadedEver;
   int? error;
   String? errorString;
   int? id;
-  int? leftUntilDone;
+  num? leftUntilDone;
   String? name;
-  int? peersGettingFromUs;
-  int? peersSendingToUs;
-  int? percentDone;
+  String? hashString;
+  String? magnetLink;
+
+  num? peersGettingFromUs;
+  num? peersSendingToUs;
+  num? percentDone;
   int? queuePosition;
-  int? rateDownload;
-  int? rateUpload;
-  int? recheckProgress;
+  num? rateDownload;
+  num? rateUpload;
+  num? recheckProgress;
   int? status;
-  int? totalSize;
+  num? totalSize;
   List<TrackerStats>? trackerStats;
-  double? uploadRatio;
-  int? uploadedEver;
+  num? uploadRatio;
+  num? uploadedEver;
 
   TransmissionBaseTorrent(
       {this.activityDate,
@@ -29,6 +32,8 @@ class TransmissionBaseTorrent {
       this.id,
       this.leftUntilDone,
       this.name,
+      this.magnetLink,
+      this.hashString,
       this.peersGettingFromUs,
       this.peersSendingToUs,
       this.percentDone,
@@ -51,6 +56,8 @@ class TransmissionBaseTorrent {
     id = json['id'];
     leftUntilDone = json['leftUntilDone'];
     name = json['name'];
+    magnetLink = json['magnetLink'];
+    hashString = json['hashString'];
     peersGettingFromUs = json['peersGettingFromUs'];
     peersSendingToUs = json['peersSendingToUs'];
     percentDone = json['percentDone'];
@@ -80,6 +87,8 @@ class TransmissionBaseTorrent {
     data['id'] = id;
     data['leftUntilDone'] = leftUntilDone;
     data['name'] = name;
+    data['magnetLink'] = magnetLink;
+    data['hashString'] = hashString;
     data['peersGettingFromUs'] = peersGettingFromUs;
     data['peersSendingToUs'] = peersSendingToUs;
     data['percentDone'] = percentDone;
