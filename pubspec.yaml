@@ -41,6 +41,8 @@ dependencies:
   random_color: ^1.0.6-nullsafety
   syncfusion_flutter_gauges: ^23.2.4
   intl: ^0.18.1
+  flutter_slidable: ^3.0.1
+  basic_utils: ^5.7.0
 
 
 dev_dependencies:
