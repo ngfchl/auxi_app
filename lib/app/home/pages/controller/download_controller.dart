@@ -125,16 +125,25 @@ class DownloadController extends GetxController {
   }
 
   Future getQbSpeed(Downloader downloader) async {
-    QBittorrentApiV2 qbittorrent = await getQbInstance(downloader);
-    TransferInfo res = await qbittorrent.transfer.getGlobalTransferInfo();
-    return CommonResponse(data: res);
+    try {
+      QBittorrentApiV2 qbittorrent = await getQbInstance(downloader);
+      TransferInfo res = await qbittorrent.transfer.getGlobalTransferInfo();
+      return CommonResponse(data: res, code: 0);
+    } catch (e, trace) {
+      LoggerHelper.Logger.instance.w(trace);
+      return CommonResponse(
+        code: -1,
+        data: null,
+        msg: '${downloader.name} 获取实时信息失败！',
+      );
+    }
   }
 
   Future<QBittorrentApiV2> getQbInstance(Downloader downloader) async {
     final qbittorrent = QBittorrentApiV2(
       baseUrl: '${downloader.http}://${downloader.host}:${downloader.port}',
       cookiePath: (await getApplicationDocumentsDirectory()).path,
-      logger: true,
+      logger: false,
     );
     await qbittorrent.auth.login(
       username: downloader.username!,
@@ -148,7 +157,8 @@ class DownloadController extends GetxController {
     var res = await transmission.v1.session.sessionStats();
     LoggerHelper.Logger.instance.w(res);
     if (res['result'] == "success") {
-      return CommonResponse(data: TransmissionStats.fromJson(res["arguments"]));
+      return CommonResponse(
+          data: TransmissionStats.fromJson(res["arguments"]), code: 0);
     }
     return CommonResponse(
       code: -1,

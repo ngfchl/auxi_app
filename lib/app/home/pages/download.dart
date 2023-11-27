@@ -7,7 +7,6 @@ import 'package:getwidget/getwidget.dart';
 import 'package:qbittorrent_api/qbittorrent_api.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../../../api/downloader.dart';
 import '../../../common/glass_widget.dart';
 import '../../../models/download.dart';
 import '../../../models/transmission.dart';
@@ -358,7 +357,7 @@ class _DownloadPageState extends State<DownloadPage>
 
   Widget buildDownloaderCard(Downloader downloader) {
     bool connectState = true;
-    getDownloaderConnectTest(downloader.id).then((res) {
+    controller.testConnect(downloader).then((res) {
       connectState = res.code == 0;
     });
     ChartSeriesController? chartSeriesController;
