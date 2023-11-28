@@ -398,6 +398,9 @@ class TorrentController extends GetxController {
               .id
               .name
               .downloadDir
+              .addedDate
+              .sizeWhenDone
+              .startDate
               .status
               .totalSize
               .percentDone
@@ -419,7 +422,7 @@ class TorrentController extends GetxController {
               .queuePosition
               .activityDate);
 
-      LoggerHelper.Logger.instance.w(res['arguments']["torrents"].length);
+      LoggerHelper.Logger.instance.w(res['arguments']["torrents"][0]);
       if (res['result'] == "success") {
         torrents.value = res['arguments']["torrents"]
             .map<TransmissionBaseTorrent>(

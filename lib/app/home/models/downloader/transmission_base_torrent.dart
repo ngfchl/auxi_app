@@ -11,6 +11,10 @@ class TransmissionBaseTorrent {
   String? magnetLink;
   String? downloadDir;
 
+  int? addedDate;
+  int? sizeWhenDone;
+  int? startDate;
+
   num? peersGettingFromUs;
   num? peersSendingToUs;
   num? percentDone;
@@ -35,6 +39,9 @@ class TransmissionBaseTorrent {
       this.name,
       this.downloadDir,
       this.magnetLink,
+      this.addedDate,
+      this.sizeWhenDone,
+      this.startDate,
       this.hashString,
       this.peersGettingFromUs,
       this.peersSendingToUs,
@@ -61,6 +68,9 @@ class TransmissionBaseTorrent {
     downloadDir = json['downloadDir'];
     magnetLink = json['magnetLink'];
     hashString = json['hashString'];
+    addedDate = json['addedDate'];
+    sizeWhenDone = json['sizeWhenDone'];
+    startDate = json['startDate'];
     peersGettingFromUs = json['peersGettingFromUs'];
     peersSendingToUs = json['peersSendingToUs'];
     percentDone = json['percentDone'];
@@ -93,6 +103,9 @@ class TransmissionBaseTorrent {
     data['downloadDir'] = downloadDir;
     data['magnetLink'] = magnetLink;
     data['hashString'] = hashString;
+    data['addedDate'] = addedDate;
+    data['sizeWhenDone'] = sizeWhenDone;
+    data['startDate'] = startDate;
     data['peersGettingFromUs'] = peersGettingFromUs;
     data['peersSendingToUs'] = peersSendingToUs;
     data['percentDone'] = percentDone;
