@@ -81,7 +81,9 @@ class DownloadController extends GetxController {
   Future<void> fetchStatusForItem(Downloader item) async {
     try {
       dynamic status = await getIntervalSpeed(item);
-      item.status.add(status.data);
+      if (status.code == 0) {
+        item.status.add(status.data);
+      }
 
       if (item.status.length > 30) {
         item.status.removeAt(0);
