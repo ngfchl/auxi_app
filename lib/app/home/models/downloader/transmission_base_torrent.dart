@@ -9,6 +9,7 @@ class TransmissionBaseTorrent {
   String? name;
   String? hashString;
   String? magnetLink;
+  String? downloadDir;
 
   num? peersGettingFromUs;
   num? peersSendingToUs;
@@ -32,6 +33,7 @@ class TransmissionBaseTorrent {
       this.id,
       this.leftUntilDone,
       this.name,
+      this.downloadDir,
       this.magnetLink,
       this.hashString,
       this.peersGettingFromUs,
@@ -56,6 +58,7 @@ class TransmissionBaseTorrent {
     id = json['id'];
     leftUntilDone = json['leftUntilDone'];
     name = json['name'];
+    downloadDir = json['downloadDir'];
     magnetLink = json['magnetLink'];
     hashString = json['hashString'];
     peersGettingFromUs = json['peersGettingFromUs'];
@@ -87,6 +90,7 @@ class TransmissionBaseTorrent {
     data['id'] = id;
     data['leftUntilDone'] = leftUntilDone;
     data['name'] = name;
+    data['downloadDir'] = downloadDir;
     data['magnetLink'] = magnetLink;
     data['hashString'] = hashString;
     data['peersGettingFromUs'] = peersGettingFromUs;

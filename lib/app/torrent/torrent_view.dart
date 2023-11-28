@@ -138,7 +138,7 @@ class TorrentView extends GetView<TorrentController> {
 
                                       print('搜索框内容变化：$value');
                                       controller.searchKey.value = value;
-                                      controller.filterTorrentsBySearchKey();
+                                      controller.filterTorrents();
                                     },
                                   ),
                                 ),
@@ -251,7 +251,7 @@ class TorrentView extends GetView<TorrentController> {
                                     onChanged: (value) {
                                       print('搜索框内容变化：$value');
                                       controller.searchKey.value = value;
-                                      controller.filterTorrentsBySearchKey();
+                                      controller.filterTorrents();
                                     },
                                   ),
                                 ),
@@ -376,46 +376,46 @@ class TorrentView extends GetView<TorrentController> {
                       );
                     }),
                   ),
-                  const ListTile(
-                    title: Text('筛选'),
-                    onTap: null,
-                  ),
-                  SizedBox(
-                    height: 200,
-                    child: ListView.builder(
-                        itemCount: controller.filters.length,
-                        itemBuilder: (context, index) {
-                          Map state = controller.filters[index];
-                          return Obx(() {
-                            return ListTile(
-                              dense: true,
-                              title: Text(
-                                '${state['name']}${controller.torrentFilter.value == state['value'] ? "(${controller.torrents.length})" : ""}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
-                              ),
-                              style: ListTileStyle.list,
-                              selected: controller.torrentFilter.value ==
-                                  state['value'],
-                              selectedColor: Colors.purple,
-                              onTap: () {
-                                // controller.category.value = 'all_torrents';
-                                controller.torrentState.value = null;
-                                LoggerHelper.Logger.instance.w(state['value']);
-                                controller.torrentFilter.value = state['value'];
-                                controller.filterTorrentsByState();
-                              },
-                            );
-                          });
-                        }),
-                  ),
+                  // const ListTile(
+                  //   title: Text('筛选'),
+                  //   onTap: null,
+                  // ),
+                  // SizedBox(
+                  //   height: 200,
+                  //   child: ListView.builder(
+                  //       itemCount: controller.filters.length,
+                  //       itemBuilder: (context, index) {
+                  //         Map state = controller.filters[index];
+                  //         return Obx(() {
+                  //           return ListTile(
+                  //             dense: true,
+                  //             title: Text(
+                  //               '${state['name']}${controller.torrentFilter.value == state['value'] ? "(${controller.torrents.length})" : ""}',
+                  //               style: const TextStyle(
+                  //                 fontSize: 12,
+                  //               ),
+                  //             ),
+                  //             style: ListTileStyle.list,
+                  //             selected: controller.torrentFilter.value ==
+                  //                 state['value'],
+                  //             selectedColor: Colors.purple,
+                  //             onTap: () {
+                  //               // controller.category.value = 'all_torrents';
+                  //               controller.torrentState.value = null;
+                  //               LoggerHelper.Logger.instance.w(state['value']);
+                  //               controller.torrentFilter.value = state['value'];
+                  //               controller.filterTorrents();
+                  //             },
+                  //           );
+                  //         });
+                  //       }),
+                  // ),
                   const ListTile(
                     title: Text('状态'),
                     onTap: null,
                   ),
                   SizedBox(
-                      height: 200,
+                      height: 250,
                       child: ListView.builder(
                           itemCount: controller.status.length,
                           itemBuilder: (context, index) {
@@ -438,7 +438,7 @@ class TorrentView extends GetView<TorrentController> {
                                       .w(state['value']);
                                   controller.torrentState.value =
                                       state['value'];
-                                  controller.filterTorrentsByState();
+                                  controller.filterTorrents();
                                 },
                               );
                             });
@@ -448,7 +448,7 @@ class TorrentView extends GetView<TorrentController> {
                     onTap: null,
                   ),
                   SizedBox(
-                    height: 200,
+                    height: 250,
                     child: Obx(() {
                       return ListView.builder(
                           itemCount: controller.categories.length,
@@ -467,6 +467,7 @@ class TorrentView extends GetView<TorrentController> {
 
                             return Obx(() {
                               return ListTile(
+                                dense: true,
                                 title: Text(
                                   '${category['name']}($count)',
                                   style: const TextStyle(
@@ -480,7 +481,7 @@ class TorrentView extends GetView<TorrentController> {
                                   controller.torrentFilter.value =
                                       TorrentFilter.all;
                                   controller.category.value = category['value'];
-                                  controller.filterTorrentsByCategory();
+                                  controller.filterTorrents();
                                 },
                               );
                             });
@@ -541,7 +542,86 @@ class TorrentView extends GetView<TorrentController> {
                       ],
                     ),
                   ),
-                  const Text('待开发'),
+                  const ListTile(
+                    dense: true,
+                    title: Text('状态'),
+                    onTap: null,
+                  ),
+                  SizedBox(
+                      height: 250,
+                      child: ListView.builder(
+                          itemCount: controller.trStatus.length,
+                          itemBuilder: (context, index) {
+                            final Map state = controller.trStatus[index];
+                            return Obx(() {
+                              return ListTile(
+                                dense: true,
+                                title: Text(
+                                  '${state['name']}(${state['value'] == null ? controller.torrents.length : controller.torrents.where((torrent) => torrent.status == state['value']).toList().length})',
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                style: ListTileStyle.list,
+                                selected: controller.trTorrentState.value ==
+                                    state['value'],
+                                selectedColor: Colors.purple,
+                                onTap: () {
+                                  LoggerHelper.Logger.instance
+                                      .w(state['value']);
+                                  controller.trTorrentState.value =
+                                      state['value'];
+                                  controller.filterTorrents();
+                                },
+                              );
+                            });
+                          })),
+                  const ListTile(
+                    dense: true,
+                    title: Text('保存路径'),
+                    onTap: null,
+                  ),
+                  SizedBox(
+                    height: 200,
+                    child: Obx(() {
+                      return ListView.builder(
+                          itemCount: controller.categories.length,
+                          itemBuilder: (context, index) {
+                            Map category = controller.categories[index];
+                            int count = 0;
+                            if (category['value'] == 'all_torrents') {
+                              count = controller.torrents.length;
+                            } else {
+                              count = controller.torrents
+                                  .where((torrent) =>
+                                      torrent.downloadDir
+                                          .replaceAll(RegExp(r'\/$'), '') ==
+                                      category['value'])
+                                  .toList()
+                                  .length;
+                            }
+
+                            return Obx(() {
+                              return ListTile(
+                                dense: true,
+                                title: Text(
+                                  '${category['name']}($count)',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                selected: controller.category.value ==
+                                    category['value'],
+                                selectedColor: Colors.purple,
+                                onTap: () {
+                                  controller.torrentFilter.value =
+                                      TorrentFilter.all;
+                                  controller.category.value = category['value'];
+                                  controller.filterTorrents();
+                                },
+                              );
+                            });
+                          });
+                    }),
+                  ),
                 ],
               ),
       ),

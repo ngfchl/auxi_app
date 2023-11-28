@@ -16,10 +16,7 @@ class TorrentController extends GetxController {
   late Downloader downloader;
   final torrents = [].obs;
   final showTorrents = [].obs;
-  final categories = <Map<String, String>>[
-    {'name': '全部', 'value': 'all_torrents'},
-    {'name': '未分类', 'value': ''},
-  ].obs;
+  final categories = <Map<String, String>>[].obs;
   final category = 'all_torrents'.obs;
   late Timer periodicTimer;
   RxBool isTimerActive = true.obs; // 使用 RxBool 控制定时器是否激活
@@ -29,6 +26,7 @@ class TorrentController extends GetxController {
   final searchKey = ''.obs;
   final statusList = RxList().obs;
   Rx<TorrentState?> torrentState = Rx<TorrentState?>(null);
+  Rx<int?> trTorrentState = Rx<int?>(null);
   Rx<TorrentFilter> torrentFilter = Rx<TorrentFilter>(TorrentFilter.all);
 
   List filters = [
@@ -51,11 +49,11 @@ class TorrentController extends GetxController {
   List status = [
     {"name": "全部", "value": null},
     {"name": "下载中", "value": TorrentState.downloading},
+    {"name": "下载暂停", "value": TorrentState.pausedDL},
     {"name": "上传中", "value": TorrentState.uploading},
     {"name": "做种中", "value": TorrentState.stalledUP},
     {"name": "等待下载", "value": TorrentState.stalledDL},
     {"name": "移动中", "value": TorrentState.moving},
-    {"name": "下载暂停", "value": TorrentState.pausedDL},
     {"name": "上传暂停", "value": TorrentState.pausedUP},
     {"name": "队列下载中", "value": TorrentState.queuedDL},
     {"name": "队列上传中", "value": TorrentState.queuedUP},
@@ -87,6 +85,16 @@ class TorrentController extends GetxController {
     {'name': '校验进度', 'value': 'recheckProgress'},
     {'name': '活动日期', 'value': 'activityDate'},
   ];
+  List<Map<String, dynamic>> trStatus = [
+    {"name": "全部", "value": null},
+    {"name": "下载ing", "value": 4},
+    {"name": "做种ing", "value": 6},
+    {"name": "已停止", "value": 0},
+    {"name": "校验ing", "value": 2},
+    {"name": "校验队列", "value": 1},
+    {"name": "排队下载", "value": 3},
+    {"name": "排队上传", "value": 5},
+  ];
   List<Map<String, String>> qbSortOptions = [
     {'name': '名称', 'value': 'name'},
     {'name': '类别', 'value': 'category'},
@@ -116,10 +124,13 @@ class TorrentController extends GetxController {
   @override
   void onInit() {
     downloader = Get.arguments;
-    getAllCategory();
+    if (downloader.category.toLowerCase() == 'qb') {
+      getAllCategory();
+    }
     getAllTorrents();
     startPeriodicTimer();
-    Timer(const Duration(minutes: 5), () {
+    Timer(Duration(seconds: (downloadController.timerDuration * 60).toInt()),
+        () {
       // 定时器触发后执行的操作，这里可以取消periodicTimer、关闭资源等
       periodicTimer.cancel();
       // 你可以在这里添加其他需要在定时器触发后执行的逻辑
@@ -143,10 +154,10 @@ class TorrentController extends GetxController {
         if (statusList.value.length > 30) {
           statusList.value.removeAt(0);
         }
-        update();
       }
     });
     isTimerActive.value = true;
+    update();
   }
 
   void cancelPeriodicTimer() {
@@ -154,7 +165,7 @@ class TorrentController extends GetxController {
       periodicTimer.cancel();
     }
     isTimerActive.value = false;
-    // update();
+    update();
   }
 
   @override
@@ -165,28 +176,47 @@ class TorrentController extends GetxController {
   @override
   void onClose() {
     periodicTimer.cancel();
-    categories.value = <Map<String, String>>[
-      {'name': '全部', 'value': 'all_torrents'},
-      {'name': '未分类', 'value': ''},
-    ];
+    categories.clear();
     torrents.clear();
     showTorrents.clear();
+    trTorrentState.value = null;
     category.value = 'all_torrent';
     super.onClose();
   }
 
   getAllCategory() async {
+    if (categories.isNotEmpty) {
+      return;
+    }
     if (downloader.category.toLowerCase() == 'qb') {
+      categories.value = <Map<String, String>>[
+        {'name': '全部', 'value': 'all_torrents'},
+        {'name': '未分类', 'value': ''},
+      ];
       QBittorrentApiV2 qbittorrent =
           await downloadController.getQbInstance(downloader);
-      qbittorrent.torrents.getCategories().then((value) {
-        categories.addAll(value.keys
-            .map<Map<String, String>>((e) => {'name': e, 'value': e})
-            .toList());
-        categories.value = categories.toSet().toList();
-        LoggerHelper.Logger.instance.w(categories);
-      });
+      categories.addAll((await qbittorrent.torrents.getCategories())
+          .keys
+          .map<Map<String, String>>((e) => {'name': e, 'value': e})
+          .toList());
+
+      LoggerHelper.Logger.instance.w(categories.length);
+    } else {
+      Set<Map<String, String>> uniqueCategories = {
+        {'name': '全部', 'value': 'all_torrents'}
+      };
+      // 取全部
+      uniqueCategories.addAll(torrents
+          .map((element) => element.downloadDir!.replaceAll(RegExp(r'\/$'), ''))
+          .toSet()
+          .map((e) => {'name': e, 'value': e}));
+      // 去重
+
+      LoggerHelper.Logger.instance.w('TR 路径：${uniqueCategories.length}');
+
+      categories.value = uniqueCategories.toList();
     }
+    update();
   }
 
   sortTorrents() {
@@ -294,52 +324,57 @@ class TorrentController extends GetxController {
     }
   }
 
-  filterTorrentsByCategory() {
-    if (category.value == 'all_torrents') {
-      showTorrents.value = torrents;
-    } else if (category.value == '') {
-      showTorrents.value =
-          torrents.where((torrent) => torrent.category.isEmpty).toList();
-    } else {
-      showTorrents.value = torrents
-          .where((torrent) => torrent.category == category.value)
-          .toList();
-    }
+  void filterTorrentsByCategory() {
+    if (category.value == 'all_torrents') return;
+
+    showTorrents.value = showTorrents.where((torrent) {
+      if (downloader.category.toLowerCase() == 'qb') {
+        return category.value.isEmpty
+            ? torrent.category.isEmpty
+            : torrent.category == category.value;
+      } else {
+        return torrent.downloadDir == category.value;
+      }
+    }).toList();
   }
 
   filterTorrentsByState() {
-    if (downloader.category.toLowerCase() == 'qb') {
-      if (torrentState.value == null) {
-        showTorrents.value = torrents;
-      } else {
-        showTorrents.value = torrents
-            .where((torrent) => torrent.state == torrentState.value)
-            .toList();
-      }
-    } else {
-      showTorrents.value = torrents;
+    final isQbCategory = downloader.category.toLowerCase() == 'qb';
+    final selectedState =
+        isQbCategory ? torrentState.value : trTorrentState.value;
+
+    LoggerHelper.Logger.instance.w('状态：$selectedState');
+    if (selectedState != null) {
+      showTorrents.value = showTorrents
+          .where((torrent) => isQbCategory
+              ? torrent.state == selectedState
+              : torrent.status == selectedState)
+          .toList();
     }
   }
 
   filterTorrentsBySearchKey() {
-    LoggerHelper.Logger.instance.w(searchKey.value);
-    if (downloader.category.toLowerCase() == 'qb') {
-      showTorrents.value = torrents
-          .where((torrent) =>
-              torrent.name!
-                  .toLowerCase()
-                  .contains(searchKey.value.toLowerCase()) ||
-              torrent.category
-                  .toLowerCase()
-                  .contains(searchKey.value.toLowerCase()))
-          .toList();
-    } else {
-      showTorrents.value = torrents
+    LoggerHelper.Logger.instance.w('搜索关键字：${searchKey.value}');
+
+    if (searchKey.value.isNotEmpty) {
+      showTorrents.value = showTorrents
           .where((torrent) => torrent.name!
               .toLowerCase()
               .contains(searchKey.value.toLowerCase()))
           .toList();
     }
+  }
+
+  filterTorrents() {
+    showTorrents.value = torrents;
+    LoggerHelper.Logger.instance.w(showTorrents.length);
+    filterTorrentsByCategory();
+    LoggerHelper.Logger.instance.w(showTorrents.length);
+    filterTorrentsByState();
+    LoggerHelper.Logger.instance.w(showTorrents.length);
+    filterTorrentsBySearchKey();
+    LoggerHelper.Logger.instance.w(showTorrents.length);
+    update();
   }
 
   Future<void> getAllTorrents() async {
@@ -362,6 +397,7 @@ class TorrentController extends GetxController {
           fields: tr.TorrentFields()
               .id
               .name
+              .downloadDir
               .status
               .totalSize
               .percentDone
@@ -389,6 +425,7 @@ class TorrentController extends GetxController {
             .map<TransmissionBaseTorrent>(
                 (item) => TransmissionBaseTorrent.fromJson(item))
             .toList();
+        await getAllCategory();
       }
     }
     // if (sortReversed.value) {
@@ -396,8 +433,7 @@ class TorrentController extends GetxController {
     //   showTorrents.value = showTorrents.reversed.toList();
     //   sortReversed.value = false;
     // }
-    filterTorrentsBySearchKey();
-    filterTorrentsByCategory();
+    filterTorrents();
     sortTorrents();
     update();
   }
