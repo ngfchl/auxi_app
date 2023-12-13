@@ -81,3 +81,22 @@ class TransmissionStats {
     );
   }
 }
+
+class TrFreeSpace {
+  String? path;
+  int? sizeBytes;
+
+  TrFreeSpace({this.path, this.sizeBytes});
+
+  TrFreeSpace.fromJson(Map<String, dynamic> json) {
+    path = json['path'];
+    sizeBytes = json['size-bytes'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['path'] = path;
+    data['size-bytes'] = sizeBytes;
+    return data;
+  }
+}
