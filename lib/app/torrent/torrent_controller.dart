@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auxi_app/models/transmission.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qbittorrent_api/qbittorrent_api.dart';
@@ -25,6 +26,7 @@ class TorrentController extends GetxController {
   final searchController = TextEditingController().obs;
   final searchKey = ''.obs;
   final statusList = RxList().obs;
+  final freeSpace = 1.obs;
   Rx<TorrentState?> torrentState = Rx<TorrentState?>(null);
   Rx<int?> trTorrentState = Rx<int?>(null);
   Rx<TorrentFilter> torrentFilter = Rx<TorrentFilter>(TorrentFilter.all);
@@ -127,6 +129,7 @@ class TorrentController extends GetxController {
     if (downloader.category.toLowerCase() == 'qb') {
       getAllCategory();
     }
+    getFreeSpace();
     getAllTorrents();
     startPeriodicTimer();
     Timer(Duration(seconds: (downloadController.timerDuration * 60).toInt()),
@@ -146,6 +149,8 @@ class TorrentController extends GetxController {
         (Timer t) async {
       // 在定时器触发时获取最新的下载器数据
       getAllTorrents();
+      getFreeSpace();
+
       dynamic status = await downloadController.getIntervalSpeed(downloader);
       LoggerHelper.Logger.instance.w('state77:${status.code}');
       if (status.code == 0) {
@@ -503,17 +508,63 @@ class TorrentController extends GetxController {
     } else {
       tr.Transmission transmission =
           downloadController.getTrInstance(downloader);
-      Map res = await transmission.v1.torrent
-          .torrentGet(fields: tr.TorrentFields.basic());
-
-      LoggerHelper.Logger.instance.w(res['arguments']["torrents"].length);
-      if (res['result'] == "success") {
-        torrents.value = res['arguments']["torrents"]
-            .map<TransmissionBaseTorrent>(
-                (item) => TransmissionBaseTorrent.fromJson(item))
-            .toList();
+      switch (command) {
+        case 'reannounce':
+          transmission.v1.torrent.torrentReannounce(ids: hashes);
+        case 'delete':
+          transmission.v1.torrent
+              .torrentRemove(ids: hashes, deleteLocalData: deleteFiles);
+        case 'resume':
+          transmission.v1.torrent.torrentStart(ids: hashes);
+        case 'ForceStart':
+          transmission.v1.torrent.torrentStartNow(ids: hashes);
+        case 'pause':
+          transmission.v1.torrent.torrentStop(ids: hashes);
+        case 'recheck':
+          transmission.v1.torrent.torrentVerify(ids: hashes);
+        case 'uploadLimit':
+          transmission.v1.torrent.torrentSet(
+              tr.TorrentSetArgs().uploadLimited(true).uploadLimit(limit),
+              ids: hashes);
+        case 'downloadLimit':
+          transmission.v1.torrent.torrentSet(
+              tr.TorrentSetArgs().downloadLimited(true).downloadLimit(limit),
+              ids: hashes);
+        case 'ShareLimit':
+          transmission.v1.torrent.torrentSet(
+              tr.TorrentSetArgs().seedRatioLimit(limit as double),
+              ids: hashes);
       }
     }
     update();
+  }
+
+  getTrFreeSpace() async {
+    tr.Transmission transmission = downloadController.getTrInstance(downloader);
+    LoggerHelper.Logger.instance.w(transmission.v1.rpc);
+
+    var res = await transmission.v1.session
+        .sessionGet(fields: tr.SessionArgs().downloadDir());
+    LoggerHelper.Logger.instance.w(res['arguments']['download-dir']);
+
+    Map response = await transmission.v1.system
+        .freeSpace(path: res['arguments']['download-dir']);
+    freeSpace.value =
+        TrFreeSpace.fromJson(response['arguments'] as Map<String, dynamic>)
+            .sizeBytes!;
+  }
+
+  getQbFreeSpace() async {
+    QBittorrentApiV2 qb = await downloadController.getQbInstance(downloader);
+    MainData m = await qb.sync.getMainData();
+    freeSpace.value = m.serverState!.freeSpaceOnDisk!;
+  }
+
+  getFreeSpace() async {
+    if (downloader.category.toLowerCase() == 'qb') {
+      getQbFreeSpace();
+    } else {
+      getTrFreeSpace();
+    }
   }
 }
