@@ -843,7 +843,7 @@ class TorrentView extends GetView<TorrentController> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '下载限速：${filesize(res.dlInfoSpeed)}/S',
+                      '下载限速：${filesize(res.dlRateLimit)}/S',
                       style: const TextStyle(
                         fontSize: 10,
                         color: Colors.black38,
