@@ -149,10 +149,10 @@ packages:
     dependency: "direct main"
     description:
       name: easy_refresh
-      sha256: a3b33b60a97e4931c3923e8b80e2f2869a080001c8742213d484c37db0d15164
+      sha256: "9465065e86ce4993c3a9c825295cd1cbcdeffaa6903fe2575b30565b5b39a1f4"
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.2+4"
+    version: "3.3.3+1"
   fake_async:
     dependency: transitive
     description:
@@ -746,10 +746,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_windows
-      sha256: "7754a1ad30ee896b265f8d14078b0513a4dba28d358eabb9d5f339886f4a1adc"
+      sha256: ecf9725510600aa2bb6d7ddabe16357691b6d2805f66216a97d1b881e21beff7
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "3.1.1"
   vector_graphics:
     dependency: transitive
     description:
