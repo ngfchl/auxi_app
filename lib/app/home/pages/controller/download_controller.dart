@@ -208,9 +208,9 @@ class DownloadController extends GetxController {
 
   Transmission getTrInstance(Downloader downloader) {
     final transmission = Transmission(
-      '${downloader.http}://${downloader.host}:${downloader.port}',
-      AuthKeys(downloader.username!, downloader.password!),
-    );
+        '${downloader.http}://${downloader.host}:${downloader.port}',
+        AuthKeys(downloader.username!, downloader.password!),
+        logConfig: ConfigLogger.showAll());
     return transmission;
   }
 

@@ -456,6 +456,8 @@ class TorrentController extends GetxController {
     RatioLimit ratioLimit = const RatioLimit.none(),
     RatioLimit seedingTimeLimit = const RatioLimit.none(),
   }) async {
+    LoggerHelper.Logger.instance.w(command);
+    LoggerHelper.Logger.instance.w(hashes);
     if (downloader.category.toLowerCase() == 'qb') {
       QBittorrentApiV2 qbittorrent =
           await downloadController.getQbInstance(downloader);
@@ -536,6 +538,7 @@ class TorrentController extends GetxController {
               ids: hashes);
       }
     }
+    getAllTorrents();
     update();
   }
 
